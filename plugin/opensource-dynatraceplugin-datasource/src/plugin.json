@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "datasource",
+  "name": "Dynatrace Plugin Datasource",
+  "id": "opensource-dynatraceplugin-datasource",
+  "metrics": true,
+  "alerting": true,
+  "backend": true,
+  "executable": "gpx_dynatrace_plugin_datasource",
+  "info": {
+    "description": "A datasource plugin that enables communication with the Dynatrace Metrics V2 API. Supports querying metrics, custom time ranges, and alerting.",
+    "author": {
+      "name": "Open source"
+    },
+    "keywords": ["datasource", "dynatrace", "metrics", "monitoring", "alerting"],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [],
+    "screenshots": [],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=10.0.3",
+    "plugins": []
+  }
+}

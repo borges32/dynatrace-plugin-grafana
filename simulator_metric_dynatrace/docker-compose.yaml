@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  dynatrace-simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dynatrace-api-simulator
+    ports:
+      - "8080:8080"
+    environment:
+      # Configure valid API tokens (comma-separated)
+      - DT_API_TOKENS=dt0c01.sample.token1,dt0c01.sample.token2,test-token
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - dynatrace-net
+
+networks:
+  dynatrace-net:
+    name: dynatrace-net
+    driver: bridge

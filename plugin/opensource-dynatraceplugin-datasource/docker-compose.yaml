@@ -1,0 +1,42 @@
+version: '3.0'
+
+services:
+  grafana:
+    container_name: 'opensource-dynatraceplugin-datasource'
+    platform: 'linux/amd64'
+    build:
+      context: ./.config
+      args:
+        grafana_image: ${GRAFANA_IMAGE:-grafana-enterprise}
+        grafana_version: ${GRAFANA_VERSION:-10.0.3}
+    ports:
+      - 3000:3000/tcp
+    volumes:
+      - ./dist:/var/lib/grafana/plugins/opensource-dynatraceplugin-datasource
+      - ./provisioning:/etc/grafana/provisioning
+    networks:
+      - dynatrace-net
+
+  dynatrace-simulator:   
+    container_name: dynatrace-api-simulator
+    image: simulator_metric_dynatrace-dynatrace-simulator:latest
+    ports:
+      - "8080:8080"
+    environment:
+      # Configure valid API tokens (comma-separated)
+      - DT_API_TOKENS=dt0c01.sample.token1,dt0c01.sample.token2,test-token
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - dynatrace-net
+
+networks:
+  dynatrace-net:
+    name: dynatrace-net
+    driver: bridge
+
