@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import { InlineField, Input, SecretInput } from '@grafana/ui';
+import { InlineField, Input, SecretInput, InlineSwitch, TextArea } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { MyDataSourceOptions, MySecureJsonData } from '../types';
 
@@ -41,6 +41,40 @@ export function ConfigEditor(props: Props) {
     });
   };
 
+  // TLS Skip Verify handler
+  const onTlsSkipVerifyChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const jsonData = {
+      ...options.jsonData,
+      tlsSkipVerify: event.currentTarget.checked,
+    };
+    onOptionsChange({ ...options, jsonData });
+  };
+
+  // TLS Certificate handler
+  const onTlsCertificateChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    onOptionsChange({
+      ...options,
+      secureJsonData: {
+        ...options.secureJsonData,
+        tlsCertificate: event.target.value,
+      },
+    });
+  };
+
+  const onResetTlsCertificate = () => {
+    onOptionsChange({
+      ...options,
+      secureJsonFields: {
+        ...options.secureJsonFields,
+        tlsCertificate: false,
+      },
+      secureJsonData: {
+        ...options.secureJsonData,
+        tlsCertificate: '',
+      },
+    });
+  };
+
   const { jsonData, secureJsonFields } = options;
   const secureJsonData = (options.secureJsonData || {}) as MySecureJsonData;
 
@@ -77,6 +111,55 @@ export function ConfigEditor(props: Props) {
           required
         />
       </InlineField>
+
+      <h3 className="page-heading">TLS/SSL Configuration</h3>
+
+      <InlineField 
+        label="Skip TLS Verify" 
+        labelWidth={20}
+        tooltip="Skip TLS certificate verification (insecure - use only for testing)"
+      >
+        <InlineSwitch
+          value={jsonData.tlsSkipVerify || false}
+          onChange={onTlsSkipVerifyChange}
+        />
+      </InlineField>
+
+      {!jsonData.tlsSkipVerify && (
+        <InlineField 
+          label="TLS Certificate" 
+          labelWidth={20}
+          tooltip="TLS client certificate in PEM format (required when TLS verification is enabled)"
+        >
+          <div style={{ width: '500px' }}>
+            <TextArea
+              value={secureJsonData.tlsCertificate || ''}
+              onChange={onTlsCertificateChange}
+              placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"
+              rows={8}
+              style={{ width: '100%', fontFamily: 'monospace', fontSize: '12px' }}
+            />
+            {(secureJsonFields && secureJsonFields.tlsCertificate) && (
+              <div style={{ marginTop: '8px' }}>
+                <span style={{ color: 'green', marginRight: '8px' }}>✓ Certificate configured</span>
+                <button 
+                  type="button" 
+                  onClick={onResetTlsCertificate}
+                  style={{ 
+                    background: 'transparent', 
+                    border: '1px solid #ccc', 
+                    padding: '2px 8px',
+                    cursor: 'pointer',
+                    borderRadius: '3px'
+                  }}
+                >
+                  Reset
+                </button>
+              </div>
+            )}
+          </div>
+        </InlineField>
+      )}
     </div>
   );
 }

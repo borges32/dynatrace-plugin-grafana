@@ -2,6 +2,8 @@ package plugin
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -39,21 +41,31 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		apiUrl = url
 	}
 
+	tlsSkipVerify := false
+	if skip, ok := jsonData["tlsSkipVerify"].(bool); ok {
+		tlsSkipVerify = skip
+	}
+
 	apiToken := settings.DecryptedSecureJSONData["apiToken"]
+	tlsCertificate := settings.DecryptedSecureJSONData["tlsCertificate"]
 
 	return &Datasource{
-		settings: settings,
-		apiUrl:   apiUrl,
-		apiToken: apiToken,
+		settings:       settings,
+		apiUrl:         apiUrl,
+		apiToken:       apiToken,
+		tlsSkipVerify:  tlsSkipVerify,
+		tlsCertificate: tlsCertificate,
 	}, nil
 }
 
 // Datasource is a Dynatrace datasource which can respond to data queries, reports
 // its health and has alerting support.
 type Datasource struct {
-	settings backend.DataSourceInstanceSettings
-	apiUrl   string
-	apiToken string
+	settings       backend.DataSourceInstanceSettings
+	apiUrl         string
+	apiToken       string
+	tlsSkipVerify  bool
+	tlsCertificate string
 }
 
 // Dispose here tells plugin SDK that plugin wants to clean up resources when a new instance
@@ -224,8 +236,13 @@ func (d *Datasource) queryDynatraceAPI(ctx context.Context, metricId string, ent
 	req.Header.Set("Authorization", fmt.Sprintf("Api-Token %s", d.apiToken))
 	req.Header.Set("Content-Type", "application/json")
 
+	// Create HTTP client with TLS configuration
+	client, err := d.createHTTPClient()
+	if err != nil {
+		return nil, fmt.Errorf("error creating HTTP client: %w", err)
+	}
+
 	// Execute request
-	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error executing request: %w", err)
@@ -247,6 +264,39 @@ func (d *Datasource) queryDynatraceAPI(ctx context.Context, metricId string, ent
 	log.DefaultLogger.Info("Dynatrace API response", "totalCount", dynatraceResp.TotalCount, "results", len(dynatraceResp.Result))
 
 	return &dynatraceResp, nil
+}
+
+// createHTTPClient creates an HTTP client with TLS configuration
+func (d *Datasource) createHTTPClient() (*http.Client, error) {
+	// Create TLS config
+	tlsConfig := &tls.Config{}
+
+	// Skip TLS verification if configured
+	if d.tlsSkipVerify {
+		log.DefaultLogger.Warn("TLS certificate verification is disabled - this is insecure!")
+		tlsConfig.InsecureSkipVerify = true
+	} else if d.tlsCertificate != "" {
+		// Load custom certificate
+		certPool := x509.NewCertPool()
+		if !certPool.AppendCertsFromPEM([]byte(d.tlsCertificate)) {
+			return nil, fmt.Errorf("failed to parse TLS certificate")
+		}
+		tlsConfig.RootCAs = certPool
+		log.DefaultLogger.Info("Using custom TLS certificate")
+	}
+
+	// Create transport with TLS config
+	transport := &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
+
+	// Create HTTP client
+	client := &http.Client{
+		Timeout:   30 * time.Second,
+		Transport: transport,
+	}
+
+	return client, nil
 }
 
 // parseTimestamp converts a timestamp string to milliseconds
@@ -298,7 +348,15 @@ func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRe
 		}, nil
 	}
 
-	client := &http.Client{Timeout: 10 * time.Second}
+	// Create HTTP client with TLS configuration
+	client, err := d.createHTTPClient()
+	if err != nil {
+		return &backend.CheckHealthResult{
+			Status:  backend.HealthStatusError,
+			Message: fmt.Sprintf("Error creating HTTP client: %v", err),
+		}, nil
+	}
+
 	resp, err := client.Do(reqHttp)
 	if err != nil {
 		return &backend.CheckHealthResult{

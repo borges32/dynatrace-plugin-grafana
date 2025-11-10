@@ -33,6 +33,9 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
 export interface MyDataSourceOptions extends DataSourceJsonData {
   // Base URL for Dynatrace API (e.g., "http://localhost:8080")
   apiUrl?: string;
+  
+  // Skip TLS certificate verification (insecure)
+  tlsSkipVerify?: boolean;
 }
 
 /**
@@ -41,4 +44,7 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
 export interface MySecureJsonData {
   // Dynatrace API Token (Api-Token format)
   apiToken?: string;
+  
+  // TLS client certificate (PEM format)
+  tlsCertificate?: string;
 }
