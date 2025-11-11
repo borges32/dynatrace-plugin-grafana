@@ -2,11 +2,12 @@
 
 Simulador da API de Métricas V2 do Dynatrace para testes e desenvolvimento.
 
-## � Documentação
+## 📚 Documentação
 
 - **[README.md](README.md)** - Documentação principal (você está aqui)
 - **[DOCKER.md](DOCKER.md)** - Guia completo de Docker e deployment
 - **[EXAMPLES.md](EXAMPLES.md)** - Exemplos práticos de requisições
+- **[QUERY_EXAMPLES.md](QUERY_EXAMPLES.md)** - Exemplos de queries com filtros complexos
 - **[AUTHENTICATION_SUMMARY.md](AUTHENTICATION_SUMMARY.md)** - Resumo da implementação de autenticação
 
 ## �🚀 Quick Start
@@ -45,8 +46,24 @@ Este simulador implementa os seguintes endpoints da API Dynatrace Metrics V2:
 
 - **GET /api/v2/metrics** - Lista todas as métricas disponíveis
 - **GET /api/v2/metrics/{metricId}** - Obtém dados de pontos de uma métrica específica
-- **POST /api/v2/metrics/query** - Consulta métricas (endpoint alternativo)
+- **GET /api/v2/metrics/query** - Consulta métricas com filtros complexos
+- **POST /api/v2/metrics/query** - Consulta métricas (método alternativo com JSON body)
 - **GET /health** - Verificação de saúde do serviço
+
+### Suporte a Filtros e Transformações
+
+O endpoint `/api/v2/metrics/query` suporta queries complexas com:
+- **Filtros** - `:filter(...)` para filtrar por entidades e condições
+- **SplitBy** - `:splitBy(...)` para agrupar por dimensões
+- **Sort** - `:sort(...)` para ordenar resultados
+
+Exemplo de query complexa:
+```bash
+curl -H "Authorization: Api-Token test-token" \
+  "http://localhost:8080/api/v2/metrics/query?metricSelector=builtin:apps.other.crashCount.osAndVersion:filter(and(or(in(\"dt.entity.device_application\",entitySelector(\"type(mobile_application)\"))))):splitBy():sort(value(auto,descending))"
+```
+
+Veja [QUERY_EXAMPLES.md](QUERY_EXAMPLES.md) para mais exemplos.
 
 ## Métricas Simuladas
 

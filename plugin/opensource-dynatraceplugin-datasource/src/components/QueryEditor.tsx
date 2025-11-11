@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import { InlineField, Input, InlineSwitch, Select } from '@grafana/ui';
+import { InlineField, Input, InlineSwitch, Select, TextArea } from '@grafana/ui';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { DataSource } from '../datasource';
 import { MyDataSourceOptions, MyQuery } from '../types';
@@ -16,14 +16,9 @@ const RESOLUTION_OPTIONS: Array<SelectableValue<string>> = [
 ];
 
 export function QueryEditor({ query, onChange, onRunQuery }: Props) {
-  // Metric ID handler
-  const onMetricIdChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...query, metricId: event.target.value });
-  };
-
-  // Entity Selector handler
-  const onEntitySelectorChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...query, entitySelector: event.target.value });
+  // Metric Selector handler (primary field)
+  const onMetricSelectorChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    onChange({ ...query, metricSelector: event.target.value });
   };
 
   // Use Dashboard Time toggle handler
@@ -47,7 +42,7 @@ export function QueryEditor({ query, onChange, onRunQuery }: Props) {
     onRunQuery();
   };
 
-  const { metricId, entitySelector, useDashboardTime, customFrom, customTo, resolution } = query;
+  const { metricSelector, useDashboardTime, customFrom, customTo, resolution } = query;
 
   return (
     <div className="gf-form-group">
@@ -55,35 +50,29 @@ export function QueryEditor({ query, onChange, onRunQuery }: Props) {
       
       <div className="gf-form">
         <InlineField 
-          label="Metric ID" 
+          label="Metric Selector" 
           labelWidth={20}
-          tooltip="Dynatrace Metric ID (e.g., builtin:host.cpu.usage, builtin:service.response.time)"
+          tooltip="Dynatrace Metric Selector with filters and transformations"
           grow
         >
-          <Input
-            onChange={onMetricIdChange}
-            onBlur={onRunQuery}
-            value={metricId || ''}
-            placeholder="builtin:host.cpu.usage"
-            width={60}
-          />
-        </InlineField>
-      </div>
-
-      <div className="gf-form">
-        <InlineField 
-          label="Entity Selector" 
-          labelWidth={20}
-          tooltip="Filter metrics by entities (e.g., type(HOST),entityName.equals('myhost'))"
-          grow
-        >
-          <Input
-            onChange={onEntitySelectorChange}
-            onBlur={onRunQuery}
-            value={entitySelector || ''}
-            placeholder="type(HOST),entityName.equals('myhost')"
-            width={60}
-          />
+          <div style={{ width: '100%' }}>
+            <TextArea
+              onChange={onMetricSelectorChange}
+              onBlur={onRunQuery}
+              value={metricSelector || ''}
+              placeholder="builtin:host.cpu.usage&#10;or with filters:&#10;builtin:apps.other.crashCount:filter(...):splitBy():sort(...)"
+              rows={3}
+              style={{ width: '100%', fontFamily: 'monospace', fontSize: '13px' }}
+            />
+            <div style={{ marginTop: '4px', fontSize: '11px', color: '#888' }}>
+              Examples:
+              <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                <li><code>builtin:host.cpu.usage</code></li>
+                <li><code>builtin:host.cpu.usage:filter(eq(dt.entity.host,HOST-123))</code></li>
+                <li><code>builtin:apps.other.crashCount.osAndVersion:filter(...):splitBy():sort(value(auto,descending))</code></li>
+              </ul>
+            </div>
+          </div>
         </InlineField>
       </div>
 

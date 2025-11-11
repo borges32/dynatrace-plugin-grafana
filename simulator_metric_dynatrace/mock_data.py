@@ -108,6 +108,38 @@ METRICS = [
             }
         ],
         "entityType": ["HOST"]
+    },
+    {
+        "metricId": "builtin:apps.other.crashCount.osAndVersion",
+        "displayName": "Crash count by OS and version",
+        "description": "Number of application crashes grouped by OS and version",
+        "unit": "Count",
+        "aggregationTypes": ["count", "sum"],
+        "transformations": ["filter", "splitBy", "sort"],
+        "defaultAggregation": {
+            "type": "count"
+        },
+        "dimensionDefinitions": [
+            {
+                "key": "dt.entity.device_application",
+                "name": "Mobile Application",
+                "index": 0,
+                "type": "ENTITY"
+            },
+            {
+                "key": "dt.entity.os",
+                "name": "Operating System",
+                "index": 1,
+                "type": "ENTITY"
+            },
+            {
+                "key": "osVersion",
+                "name": "OS Version",
+                "index": 2,
+                "type": "STRING"
+            }
+        ],
+        "entityType": ["MOBILE_APPLICATION"]
     }
 ]
 
@@ -151,6 +183,8 @@ def get_mock_data_points(metric_id, from_timestamp, to_timestamp, resolution="1m
             value = random.uniform(100, 5000)
         elif "request.count" in metric_id:
             value = random.randint(10, 1000)
+        elif "crashCount" in metric_id:
+            value = random.randint(0, 50)
         elif "disk" in metric_id:
             value = random.uniform(1000000000, 10000000000)
         else:

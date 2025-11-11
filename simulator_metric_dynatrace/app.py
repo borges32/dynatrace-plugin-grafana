@@ -112,6 +112,137 @@ def list_metrics():
     return jsonify(response), 200
 
 
+@app.route('/api/v2/metrics/query', methods=['GET', 'POST'])
+@require_api_token
+def query_metrics():
+    """
+    Query metrics with complex filters (supports both GET and POST)
+    
+    Query parameters (GET):
+    - metricSelector: Metric selector with filters, transformations (required)
+      Examples:
+        - builtin:apps.other.crashCount.osAndVersion
+        - builtin:apps.other.crashCount.osAndVersion:filter(...)
+        - builtin:apps.other.crashCount.osAndVersion:filter(...):splitBy():sort(value(auto,descending))
+    - from: Start timestamp in milliseconds (optional for some queries)
+    - to: End timestamp in milliseconds (optional)
+    - resolution: Data resolution (optional)
+    - entitySelector: Additional entity filtering (optional)
+    
+    Body (POST):
+    - Same parameters as GET but in JSON format
+    """
+    # Support both GET and POST methods
+    if request.method == 'POST':
+        data = request.get_json() or {}
+        metric_selector = data.get('metricSelector', '')
+        from_param = data.get('from')
+        to_param = data.get('to')
+        resolution = data.get('resolution', '1m')
+        entity_selector = data.get('entitySelector', '')
+    else:  # GET
+        metric_selector = request.args.get('metricSelector', '')
+        from_param = request.args.get('from')
+        to_param = request.args.get('to')
+        resolution = request.args.get('resolution', '1m')
+        entity_selector = request.args.get('entitySelector', '')
+    
+    # Set defaults
+    if not to_param:
+        to_param = str(int(time.time() * 1000))
+    if not from_param:
+        # Default to last hour
+        from_param = str(int(time.time() * 1000) - 3600000)
+    
+    # Parse metric selector to extract base metric ID
+    # Format: metricId:filter(...):splitBy(...):sort(...)
+    base_metric_id = metric_selector.split(':')[0] if metric_selector else ''
+    
+    # Extract filter information (simplified parsing)
+    has_filter = ':filter(' in metric_selector
+    has_split_by = ':splitBy(' in metric_selector
+    has_sort = ':sort(' in metric_selector
+    
+    # Find matching metric
+    matching_metric = None
+    if base_metric_id:
+        matching_metric = next((m for m in METRICS if m['metricId'] == base_metric_id), None)
+    
+    # If exact match not found, try partial match
+    if not matching_metric and base_metric_id:
+        matching_metric = next((m for m in METRICS if base_metric_id in m['metricId']), None)
+    
+    # If still not found, use first metric as fallback
+    if not matching_metric:
+        matching_metric = METRICS[0] if METRICS else None
+    
+    if not matching_metric:
+        return jsonify({
+            "error": {
+                "code": 404,
+                "message": f"No metrics found matching selector '{metric_selector}'"
+            }
+        }), 404
+    
+    # Generate mock data points
+    data_points = get_mock_data_points(
+        matching_metric['metricId'], 
+        int(from_param), 
+        int(to_param), 
+        resolution
+    )
+    
+    # Build response - format depends on transformations
+    if has_split_by:
+        # When splitBy is used, return data with dimensions
+        response = {
+            "totalCount": 1,
+            "nextPageKey": None,
+            "resolution": resolution,
+            "result": [
+                {
+                    "metricId": base_metric_id or matching_metric['metricId'],
+                    "dataPointCountRatio": 1.0,
+                    "dimensionCountRatio": 1.0,
+                    "data": [
+                        {
+                            "dimensions": ["dt.entity.device_application"],
+                            "dimensionMap": {
+                                "dt.entity.device_application": "MOBILE_APPLICATION-1234567890ABCDEF"
+                            },
+                            "timestamps": [dp[0] for dp in data_points],
+                            "values": [dp[1] for dp in data_points]
+                        }
+                    ]
+                }
+            ]
+        }
+    else:
+        # Standard response without dimensions
+        response = {
+            "totalCount": 1,
+            "nextPageKey": None,
+            "resolution": resolution,
+            "result": [
+                {
+                    "metricId": base_metric_id or matching_metric['metricId'],
+                    "dataPointCountRatio": 1.0,
+                    "dimensionCountRatio": 1.0,
+                    "data": [
+                        {
+                            "dimensions": [],
+                            "dimensionMap": {},
+                            "timestamps": [dp[0] for dp in data_points],
+                            "values": [dp[1] for dp in data_points]
+                        }
+                    ]
+                }
+            ]
+        }
+    
+    return jsonify(response), 200
+
+
 @app.route('/api/v2/metrics/<path:metric_id>', methods=['GET'])
 @require_api_token
 def get_metric_data_points(metric_id):
@@ -183,68 +314,6 @@ def get_metric_data_points(metric_id):
     return jsonify(response), 200
 
 
-@app.route('/api/v2/metrics/query', methods=['POST'])
-@require_api_token
-def query_metrics():
-    """
-    Query metrics with POST method (alternative endpoint)
-    """
-    data = request.get_json()
-    metric_selector = data.get('metricSelector', '')
-    from_param = data.get('from')
-    to_param = data.get('to', int(time.time() * 1000))
-    resolution = data.get('resolution', '1m')
-    
-    if not from_param:
-        return jsonify({
-            "error": {
-                "code": 400,
-                "message": "Missing required parameter 'from'"
-            }
-        }), 400
-    
-    # Simplified - return data for first matching metric
-    matching_metric = next((m for m in METRICS if metric_selector in m['metricId']), None)
-    
-    if not matching_metric:
-        return jsonify({
-            "error": {
-                "code": 404,
-                "message": f"No metrics found matching selector '{metric_selector}'"
-            }
-        }), 404
-    
-    data_points = get_mock_data_points(
-        matching_metric['metricId'], 
-        from_param, 
-        to_param, 
-        resolution
-    )
-    
-    response = {
-        "totalCount": 1,
-        "nextPageKey": None,
-        "resolution": resolution,
-        "result": [
-            {
-                "metricId": matching_metric['metricId'],
-                "dataPointCountRatio": 1.0,
-                "dimensionCountRatio": 1.0,
-                "data": [
-                    {
-                        "dimensions": [],
-                        "dimensionMap": {},
-                        "timestamps": [dp[0] for dp in data_points],
-                        "values": [dp[1] for dp in data_points]
-                    }
-                ]
-            }
-        ]
-    }
-    
-    return jsonify(response), 200
-
-
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -260,8 +329,13 @@ def root():
         "endpoints": {
             "list_metrics": "GET /api/v2/metrics",
             "get_metric_data": "GET /api/v2/metrics/{metricId}",
-            "query_metrics": "POST /api/v2/metrics/query",
+            "query_metrics": "GET|POST /api/v2/metrics/query",
             "health": "GET /health"
+        },
+        "examples": {
+            "simple_query": "/api/v2/metrics/query?metricSelector=builtin:host.cpu.usage",
+            "filtered_query": "/api/v2/metrics/query?metricSelector=builtin:apps.other.crashCount.osAndVersion:filter(and(or(in(\"dt.entity.os\",entitySelector(\"type(os)\")))))&from=1699500000000&to=1699503600000",
+            "complex_query": "/api/v2/metrics/query?metricSelector=builtin:apps.other.crashCount.osAndVersion:filter(...):splitBy():sort(value(auto,descending))"
         }
     }), 200
 
@@ -274,8 +348,11 @@ if __name__ == '__main__':
     print("\nAvailable endpoints:")
     print("  GET  /api/v2/metrics - List all metrics")
     print("  GET  /api/v2/metrics/{metricId} - Get metric data points")
-    print("  POST /api/v2/metrics/query - Query metrics")
+    print("  GET  /api/v2/metrics/query - Query metrics with filters")
+    print("  POST /api/v2/metrics/query - Query metrics (JSON body)")
     print("  GET  /health - Health check")
+    print("\nExample query with filters:")
+    print("  /api/v2/metrics/query?metricSelector=builtin:apps.other.crashCount.osAndVersion:filter(...):splitBy():sort(...)")
     print("=" * 60)
     
     app.run(host='0.0.0.0', port=8080, debug=True)

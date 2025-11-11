@@ -4,9 +4,15 @@ import { DataQuery, DataSourceJsonData } from '@grafana/data';
  * Query configuration for Dynatrace metrics
  */
 export interface MyQuery extends DataQuery {
-  // Metric ID from Dynatrace (e.g., "builtin:host.cpu.usage")
+  // Metric selector with transformations (e.g., "builtin:host.cpu.usage:filter(...):splitBy()")
+  // This is the primary field for querying metrics with complex filters
+  metricSelector?: string;
+  
+  // DEPRECATED: Use metricSelector instead
+  // Kept for backward compatibility
   metricId?: string;
   
+  // DEPRECATED: Use filters in metricSelector instead
   // Entity selector to filter metrics (e.g., "type(HOST),entityName.equals(myhost)")
   entitySelector?: string;
   
@@ -24,7 +30,7 @@ export interface MyQuery extends DataQuery {
 export const DEFAULT_QUERY: Partial<MyQuery> = {
   useDashboardTime: true,
   resolution: '5m',
-  metricId: '',
+  metricSelector: '',
 };
 
 /**

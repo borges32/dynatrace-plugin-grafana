@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -99,8 +100,9 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 
 // queryModel represents the query configuration from frontend
 type queryModel struct {
-	MetricId         string  `json:"metricId"`
-	EntitySelector   string  `json:"entitySelector"`
+	MetricSelector   string  `json:"metricSelector"` // Primary field: metric with filters/transformations
+	MetricId         string  `json:"metricId"`       // DEPRECATED: Use MetricSelector instead
+	EntitySelector   string  `json:"entitySelector"` // DEPRECATED: Use filters in MetricSelector
 	UseDashboardTime bool    `json:"useDashboardTime"`
 	CustomFrom       string  `json:"customFrom"`
 	CustomTo         string  `json:"customTo"`
@@ -141,11 +143,27 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
 	}
 
-	log.DefaultLogger.Info("Query model", "metricId", qm.MetricId, "useDashboardTime", qm.UseDashboardTime)
+	// Log raw query JSON for debugging
+	log.DefaultLogger.Info("Raw query JSON", "json", string(query.JSON))
 
-	// Validate metric ID
-	if qm.MetricId == "" {
-		return backend.ErrDataResponse(backend.StatusBadRequest, "metricId is required")
+	// Determine which field to use (metricSelector takes precedence)
+	metricSelector := qm.MetricSelector
+	if metricSelector == "" {
+		// Fallback to legacy metricId field for backward compatibility
+		metricSelector = qm.MetricId
+		log.DefaultLogger.Info("Using legacy metricId field", "metricId", qm.MetricId)
+		// Add entitySelector as filter if provided (legacy support)
+		if qm.EntitySelector != "" {
+			metricSelector = fmt.Sprintf("%s:filter(%s)", metricSelector, qm.EntitySelector)
+			log.DefaultLogger.Info("Added entitySelector to metricSelector", "entitySelector", qm.EntitySelector)
+		}
+	}
+
+	log.DefaultLogger.Info("Query model", "metricSelector", metricSelector, "useDashboardTime", qm.UseDashboardTime)
+
+	// Validate metric selector
+	if metricSelector == "" {
+		return backend.ErrDataResponse(backend.StatusBadRequest, "metricSelector or metricId is required")
 	}
 
 	// Determine time range
@@ -172,8 +190,8 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 		resolution = "5m"
 	}
 
-	// Query Dynatrace API
-	dynatraceResp, err := d.queryDynatraceAPI(ctx, qm.MetricId, qm.EntitySelector, fromMs, toMs, resolution)
+	// Query Dynatrace API using /api/v2/metrics/query endpoint
+	dynatraceResp, err := d.queryDynatraceAPI(ctx, metricSelector, fromMs, toMs, resolution)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusInternal, fmt.Sprintf("error querying Dynatrace API: %v", err))
 	}
@@ -213,21 +231,24 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 	return response
 }
 
-// queryDynatraceAPI queries the Dynatrace Metrics V2 API
-func (d *Datasource) queryDynatraceAPI(ctx context.Context, metricId string, entitySelector string, fromMs, toMs int64, resolution string) (*DynatraceMetricsResponse, error) {
-	// Build URL
-	url := fmt.Sprintf("%s/api/v2/metrics/%s?from=%d&to=%d&resolution=%s",
-		d.apiUrl, metricId, fromMs, toMs, resolution)
+// queryDynatraceAPI queries the Dynatrace Metrics V2 API using /api/v2/metrics/query endpoint
+func (d *Datasource) queryDynatraceAPI(ctx context.Context, metricSelector string, fromMs, toMs int64, resolution string) (*DynatraceMetricsResponse, error) {
+	// Build URL for /api/v2/metrics/query endpoint with proper URL encoding
+	baseUrl := fmt.Sprintf("%s/api/v2/metrics/query", d.apiUrl)
 
-	// Add entitySelector if provided
-	if entitySelector != "" {
-		url = fmt.Sprintf("%s&entitySelector=%s", url, entitySelector)
-	}
+	// Create URL with query parameters
+	params := url.Values{}
+	params.Add("metricSelector", metricSelector)
+	params.Add("from", fmt.Sprintf("%d", fromMs))
+	params.Add("to", fmt.Sprintf("%d", toMs))
+	params.Add("resolution", resolution)
 
-	log.DefaultLogger.Info("Querying Dynatrace API", "url", url)
+	fullUrl := fmt.Sprintf("%s?%s", baseUrl, params.Encode())
+
+	log.DefaultLogger.Info("Querying Dynatrace API", "url", fullUrl)
 
 	// Create request
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", fullUrl, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
