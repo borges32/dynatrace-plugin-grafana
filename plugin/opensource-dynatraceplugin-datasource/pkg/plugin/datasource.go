@@ -203,8 +203,25 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 
 	for _, result := range dynatraceResp.Result {
 		for _, dataSet := range result.Data {
-			// Create data frame
-			frame := data.NewFrame(result.MetricId)
+			// Log dimensionMap for debugging
+			log.DefaultLogger.Info("Processing data", "metricId", result.MetricId, "dimensionMap", dataSet.DimensionMap, "dimensionCount", len(dataSet.DimensionMap))
+
+			// Create frame name based on metric ID and dimensions
+			frameName := result.MetricId
+			if len(dataSet.DimensionMap) > 0 {
+				// Build a descriptive name including dimension values
+				dimensionLabels := ""
+				for key, value := range dataSet.DimensionMap {
+					if dimensionLabels != "" {
+						dimensionLabels += ", "
+					}
+					dimensionLabels += fmt.Sprintf("%s=%s", key, value)
+				}
+				frameName = fmt.Sprintf("%s{%s}", result.MetricId, dimensionLabels)
+			}
+
+			// Create data frame with descriptive name
+			frame := data.NewFrame(frameName)
 
 			// Convert timestamps to time.Time
 			times := make([]time.Time, len(dataSet.Timestamps))
@@ -212,15 +229,37 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 				times[i] = time.UnixMilli(ts)
 			}
 
-			// Add fields
-			frame.Fields = append(frame.Fields,
-				data.NewField("time", nil, times),
-				data.NewField("value", nil, dataSet.Values),
-			)
+			// Add time field
+			frame.Fields = append(frame.Fields, data.NewField("time", nil, times))
+
+			// Add value field with labels from dimensionMap
+			// Note: dimensionMap can be nil or empty map, both are handled correctly by NewField
+			labels := dataSet.DimensionMap
+			if labels == nil {
+				labels = make(map[string]string)
+			}
+
+			// Build field name from dimension values to avoid "value" prefix in legend
+			fieldName := result.MetricId
+			if len(labels) > 0 {
+				// Use dimension values in field name for better legend display
+				dimensionValues := ""
+				for _, value := range labels {
+					if dimensionValues != "" {
+						dimensionValues += " "
+					}
+					dimensionValues += value
+				}
+				fieldName = dimensionValues
+			}
+
+			log.DefaultLogger.Info("Creating value field with labels", "labels", labels, "fieldName", fieldName)
+			valueField := data.NewField(fieldName, labels, dataSet.Values)
+			frame.Fields = append(frame.Fields, valueField)
 
 			// Add metadata for better visualization
 			frame.Meta = &data.FrameMeta{
-				ExecutedQueryString: fmt.Sprintf("Metric: %s, Resolution: %s", qm.MetricId, resolution),
+				ExecutedQueryString: fmt.Sprintf("Metric: %s, Resolution: %s", result.MetricId, resolution),
 			}
 
 			// Add the frame to the response
