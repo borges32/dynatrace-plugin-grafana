@@ -1,0 +1,2142 @@
+[
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-7B94CA28812AEDEB, dt.entity.service_method.name=criarCobrancaPut - bki.cielo.com.br}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-7B94CA28812AEDEB criarCobrancaPut - bki.cielo.com.br",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-7B94CA28812AEDEB",
+            "dt.entity.service_method.name": "criarCobrancaPut - bki.cielo.com.br"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          2140,
+          2209,
+          2157,
+          2124,
+          2097,
+          2147,
+          2223,
+          2062,
+          2051,
+          2208,
+          2155,
+          2228,
+          2201,
+          2194,
+          2356,
+          2122,
+          2321,
+          2160,
+          2199,
+          2250,
+          2397,
+          2299,
+          2382,
+          2589,
+          2607,
+          2531,
+          2645,
+          2790,
+          2619,
+          2724,
+          2679,
+          17
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-586B0DAF0DCA0215, dt.entity.service_method.name=criarCobrancaPutEmv - IFOOD COM AGENCIA DE RESTAURANTES ONLINE S A:14380200000121}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-586B0DAF0DCA0215 criarCobrancaPutEmv - IFOOD COM AGENCIA DE RESTAURANTES ONLINE S A:14380200000121",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-586B0DAF0DCA0215",
+            "dt.entity.service_method.name": "criarCobrancaPutEmv - IFOOD COM AGENCIA DE RESTAURANTES ONLINE S A:14380200000121"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          1368,
+          1204,
+          1225,
+          1376,
+          1298,
+          1300,
+          1228,
+          1183,
+          1203,
+          1279,
+          1087,
+          1129,
+          1165,
+          1167,
+          1052,
+          1134,
+          1095,
+          1034,
+          1104,
+          1017,
+          1075,
+          1173,
+          1032,
+          1081,
+          905,
+          928,
+          890,
+          957,
+          775,
+          794,
+          891,
+          8
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-603D7E616AA4753C, dt.entity.service_method.name=criarCobrancaPut - MIDWAY S.A. - CREDITO, FINANCIAMENTO E INVESTIMENTO/UID=42609b73-82bc-5758-9c12-7e0bcc84885e}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-603D7E616AA4753C criarCobrancaPut - MIDWAY S.A. - CREDITO, FINANCIAMENTO E INVESTIMENTO/UID=42609b73-82bc-5758-9c12-7e0bcc84885e",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-603D7E616AA4753C",
+            "dt.entity.service_method.name": "criarCobrancaPut - MIDWAY S.A. - CREDITO, FINANCIAMENTO E INVESTIMENTO/UID=42609b73-82bc-5758-9c12-7e0bcc84885e"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          780,
+          736,
+          843,
+          760,
+          788,
+          771,
+          747,
+          724,
+          627,
+          831,
+          684,
+          670,
+          710,
+          641,
+          541,
+          609,
+          737,
+          613,
+          681,
+          622,
+          693,
+          670,
+          691,
+          872,
+          730,
+          769,
+          728,
+          788,
+          824,
+          821,
+          819,
+          2
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-18139EC90811FFFE, dt.entity.service_method.name=criarCobrancaPut - pix.linxpayhub.com.br}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-18139EC90811FFFE criarCobrancaPut - pix.linxpayhub.com.br",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-18139EC90811FFFE",
+            "dt.entity.service_method.name": "criarCobrancaPut - pix.linxpayhub.com.br"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          479,
+          556,
+          531,
+          477,
+          508,
+          482,
+          482,
+          537,
+          481,
+          467,
+          494,
+          417,
+          544,
+          448,
+          450,
+          436,
+          437,
+          509,
+          535,
+          492,
+          520,
+          522,
+          436,
+          515,
+          565,
+          472,
+          516,
+          474,
+          522,
+          473,
+          491,
+          1
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-BB101BA7244DFE13, dt.entity.service_method.name=criarCobrancaPutEmv - valter.soares@havan.com.br/Email=valter.soares@havan.com.br}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-BB101BA7244DFE13 criarCobrancaPutEmv - valter.soares@havan.com.br/Email=valter.soares@havan.com.br",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-BB101BA7244DFE13",
+            "dt.entity.service_method.name": "criarCobrancaPutEmv - valter.soares@havan.com.br/Email=valter.soares@havan.com.br"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          356,
+          391,
+          353,
+          355,
+          333,
+          316,
+          356,
+          325,
+          319,
+          355,
+          376,
+          374,
+          331,
+          399,
+          388,
+          427,
+          420,
+          328,
+          339,
+          356,
+          438,
+          425,
+          375,
+          330,
+          432,
+          422,
+          343,
+          425,
+          431,
+          397,
+          330,
+          1
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-89C6F5AAA16E197E, dt.entity.service_method.name=criarCobrancaPostEmv - PARCELA EXPRESS SERVICOS DIGITAIS S A:32602300000137}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-89C6F5AAA16E197E criarCobrancaPostEmv - PARCELA EXPRESS SERVICOS DIGITAIS S A:32602300000137",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-89C6F5AAA16E197E",
+            "dt.entity.service_method.name": "criarCobrancaPostEmv - PARCELA EXPRESS SERVICOS DIGITAIS S A:32602300000137"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          277,
+          272,
+          273,
+          306,
+          311,
+          323,
+          305,
+          315,
+          282,
+          306,
+          299,
+          283,
+          288,
+          367,
+          304,
+          286,
+          303,
+          297,
+          322,
+          263,
+          323,
+          272,
+          295,
+          326,
+          318,
+          260,
+          271,
+          278,
+          281,
+          307,
+          281,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-F1B0A33140EA7319, dt.entity.service_method.name=criarCobrancaPut - ON TECNOLOGIA DE MOBILIDADE URBANA S A:26054490000100}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "criarCobrancaPut - ON TECNOLOGIA DE MOBILIDADE URBANA S A:26054490000100 SERVICE_METHOD-F1B0A33140EA7319",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-F1B0A33140EA7319",
+            "dt.entity.service_method.name": "criarCobrancaPut - ON TECNOLOGIA DE MOBILIDADE URBANA S A:26054490000100"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          234,
+          257,
+          252,
+          295,
+          225,
+          256,
+          254,
+          220,
+          228,
+          232,
+          312,
+          266,
+          247,
+          239,
+          230,
+          207,
+          237,
+          229,
+          194,
+          209,
+          181,
+          204,
+          230,
+          201,
+          226,
+          204,
+          220,
+          185,
+          184,
+          188,
+          156,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-BCE111E42059FEE5, dt.entity.service_method.name=criarCobrancaPut - GAZIN INDUSTRIA E COMERCIO DE MOVEIS E ELETRODOME:77941490000155}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-BCE111E42059FEE5 criarCobrancaPut - GAZIN INDUSTRIA E COMERCIO DE MOVEIS E ELETRODOME:77941490000155",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-BCE111E42059FEE5",
+            "dt.entity.service_method.name": "criarCobrancaPut - GAZIN INDUSTRIA E COMERCIO DE MOVEIS E ELETRODOME:77941490000155"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          129,
+          195,
+          132,
+          193,
+          149,
+          114,
+          150,
+          149,
+          156,
+          153,
+          199,
+          155,
+          124,
+          207,
+          148,
+          199,
+          184,
+          174,
+          225,
+          162,
+          160,
+          138,
+          164,
+          182,
+          229,
+          171,
+          237,
+          157,
+          172,
+          170,
+          202,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-573ABFFA4BF76E65, dt.entity.service_method.name=criarCobrancaPut - DROGARIA ARAUJO S A:17256512000116}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "criarCobrancaPut - DROGARIA ARAUJO S A:17256512000116 SERVICE_METHOD-573ABFFA4BF76E65",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-573ABFFA4BF76E65",
+            "dt.entity.service_method.name": "criarCobrancaPut - DROGARIA ARAUJO S A:17256512000116"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          160,
+          154,
+          156,
+          171,
+          117,
+          146,
+          152,
+          149,
+          180,
+          131,
+          130,
+          135,
+          157,
+          171,
+          168,
+          158,
+          194,
+          132,
+          158,
+          118,
+          155,
+          171,
+          146,
+          204,
+          154,
+          179,
+          153,
+          173,
+          118,
+          145,
+          166,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-48A584F9769E2CB6, dt.entity.service_method.name=criarCobrancaPut - *.unoparead.com.br}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-48A584F9769E2CB6 criarCobrancaPut - *.unoparead.com.br",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-48A584F9769E2CB6",
+            "dt.entity.service_method.name": "criarCobrancaPut - *.unoparead.com.br"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          38,
+          128,
+          119,
+          105,
+          110,
+          143,
+          112,
+          106,
+          136,
+          77,
+          83,
+          94,
+          100,
+          119,
+          97,
+          88,
+          137,
+          71,
+          109,
+          108,
+          61,
+          78,
+          117,
+          143,
+          86,
+          132,
+          70,
+          65,
+          73,
+          111,
+          96,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-9005BEE53D2FB8E0, dt.entity.service_method.name=criarCobrancaPutEmv - BRISANET SERVICOS DE TELECOMUNICACOES S A:04601397000128}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-9005BEE53D2FB8E0 criarCobrancaPutEmv - BRISANET SERVICOS DE TELECOMUNICACOES S A:04601397000128",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-9005BEE53D2FB8E0",
+            "dt.entity.service_method.name": "criarCobrancaPutEmv - BRISANET SERVICOS DE TELECOMUNICACOES S A:04601397000128"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          96,
+          78,
+          118,
+          81,
+          114,
+          72,
+          81,
+          104,
+          68,
+          83,
+          52,
+          104,
+          127,
+          43,
+          80,
+          56,
+          91,
+          124,
+          73,
+          90,
+          74,
+          72,
+          109,
+          116,
+          73,
+          72,
+          82,
+          65,
+          72,
+          89,
+          82,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-4114CD9A91D48796, dt.entity.service_method.name=criarCobrancaPut - checkout.prd.ecomm.grupoboticario.digital}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-4114CD9A91D48796 criarCobrancaPut - checkout.prd.ecomm.grupoboticario.digital",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-4114CD9A91D48796",
+            "dt.entity.service_method.name": "criarCobrancaPut - checkout.prd.ecomm.grupoboticario.digital"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          59,
+          48,
+          48,
+          47,
+          54,
+          71,
+          91,
+          79,
+          43,
+          42,
+          77,
+          46,
+          56,
+          70,
+          83,
+          51,
+          75,
+          32,
+          50,
+          66,
+          69,
+          58,
+          52,
+          79,
+          81,
+          73,
+          95,
+          82,
+          44,
+          44,
+          103,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-2C923A3022A0168B, dt.entity.service_method.name=criarCobrancaPutEmv - TIM S A:02421421000111}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-2C923A3022A0168B criarCobrancaPutEmv - TIM S A:02421421000111",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-2C923A3022A0168B",
+            "dt.entity.service_method.name": "criarCobrancaPutEmv - TIM S A:02421421000111"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          81,
+          98,
+          60,
+          83,
+          66,
+          65,
+          37,
+          55,
+          67,
+          51,
+          103,
+          72,
+          70,
+          70,
+          43,
+          70,
+          35,
+          38,
+          51,
+          50,
+          52,
+          65,
+          71,
+          49,
+          65,
+          48,
+          76,
+          86,
+          70,
+          39,
+          62,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-085006BECDAECC9C, dt.entity.service_method.name=criarCobrancaPutEmv - payment-partner-bradesco.prd.appshellbox.com}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-085006BECDAECC9C criarCobrancaPutEmv - payment-partner-bradesco.prd.appshellbox.com",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-085006BECDAECC9C",
+            "dt.entity.service_method.name": "criarCobrancaPutEmv - payment-partner-bradesco.prd.appshellbox.com"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          32,
+          44,
+          58,
+          35,
+          26,
+          26,
+          38,
+          31,
+          34,
+          65,
+          34,
+          52,
+          42,
+          49,
+          59,
+          64,
+          46,
+          47,
+          41,
+          25,
+          52,
+          39,
+          36,
+          46,
+          84,
+          47,
+          61,
+          62,
+          44,
+          41,
+          52,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method.name=criarCobrancaPut - GRINGO PAY S A:26081403000104, dt.entity.service_method=SERVICE_METHOD-51955FF0D8A1DCE2}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-51955FF0D8A1DCE2 criarCobrancaPut - GRINGO PAY S A:26081403000104",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-51955FF0D8A1DCE2",
+            "dt.entity.service_method.name": "criarCobrancaPut - GRINGO PAY S A:26081403000104"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          22,
+          35,
+          52,
+          33,
+          22,
+          56,
+          15,
+          40,
+          30,
+          31,
+          33,
+          41,
+          15,
+          43,
+          45,
+          57,
+          27,
+          33,
+          34,
+          23,
+          26,
+          43,
+          39,
+          39,
+          39,
+          34,
+          34,
+          23,
+          22,
+          31,
+          31,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-CAD16BC29E7D026A, dt.entity.service_method.name=criarCobrancaPut - ASAAS GESTAO FINANCEIRA INSTITUICAO DE PAGAMENTO:19540550000121}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-CAD16BC29E7D026A criarCobrancaPut - ASAAS GESTAO FINANCEIRA INSTITUICAO DE PAGAMENTO:19540550000121",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-CAD16BC29E7D026A",
+            "dt.entity.service_method.name": "criarCobrancaPut - ASAAS GESTAO FINANCEIRA INSTITUICAO DE PAGAMENTO:19540550000121"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          8,
+          0,
+          6,
+          4,
+          1,
+          153,
+          36,
+          101,
+          1,
+          3,
+          5,
+          6,
+          7,
+          1,
+          1,
+          1,
+          12,
+          1,
+          6,
+          9,
+          11,
+          330,
+          3,
+          20,
+          1,
+          2,
+          4,
+          7,
+          1,
+          0,
+          4,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-1452C5DC10C04DDD, dt.entity.service_method.name=criarCobrancaPut - EZZEPAY INSTITUICAO DE PAGAMENTO LTDA:37743906000106}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-1452C5DC10C04DDD criarCobrancaPut - EZZEPAY INSTITUICAO DE PAGAMENTO LTDA:37743906000106",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-1452C5DC10C04DDD",
+            "dt.entity.service_method.name": "criarCobrancaPut - EZZEPAY INSTITUICAO DE PAGAMENTO LTDA:37743906000106"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          22,
+          23,
+          15,
+          14,
+          11,
+          14,
+          15,
+          18,
+          28,
+          10,
+          12,
+          12,
+          19,
+          7,
+          16,
+          10,
+          21,
+          19,
+          18,
+          11,
+          19,
+          19,
+          0,
+          13,
+          11,
+          34,
+          20,
+          15,
+          13,
+          19,
+          10,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-D81AE0D2BAA03D21, dt.entity.service_method.name=criarCobrancaPutEmv - *.hsbrazil.com.br}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-D81AE0D2BAA03D21 criarCobrancaPutEmv - *.hsbrazil.com.br",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-D81AE0D2BAA03D21",
+            "dt.entity.service_method.name": "criarCobrancaPutEmv - *.hsbrazil.com.br"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          9,
+          5,
+          4,
+          6,
+          12,
+          3,
+          12,
+          18,
+          18,
+          10,
+          7,
+          3,
+          10,
+          11,
+          2,
+          0,
+          9,
+          11,
+          8,
+          9,
+          6,
+          11,
+          6,
+          11,
+          14,
+          2,
+          3,
+          8,
+          3,
+          18,
+          2,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-1DE4885A6527D286, dt.entity.service_method.name=criarCobrancaPut - SERASA S A:62173620000180}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-1DE4885A6527D286 criarCobrancaPut - SERASA S A:62173620000180",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-1DE4885A6527D286",
+            "dt.entity.service_method.name": "criarCobrancaPut - SERASA S A:62173620000180"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          4,
+          14,
+          7,
+          15,
+          2,
+          5,
+          12,
+          14,
+          6,
+          3,
+          7,
+          2,
+          25,
+          0,
+          3,
+          4,
+          15,
+          6,
+          2,
+          5,
+          10,
+          4,
+          10,
+          4,
+          4,
+          13,
+          11,
+          3,
+          0,
+          7,
+          2,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "B",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "executedQueryString": "Metric: builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20), Resolution: 5m"
+      },
+      "name": "builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method),fromRelationship.isServiceMethodOfService(type(SERVICE),entityName.equals(~\"CriarCobrancaController /bspi-srv-apipix-criar-cobranca - pjl2~\"))\"))))):splitBy(\"dt.entity.service_method\"):names:sort(value(auto,descending)):limit(20){dt.entity.service_method=SERVICE_METHOD-54CAAEB758814F53, dt.entity.service_method.name=criarCobrancaPutEmv - FIX PAY ADMINISTRACAO DE PAGAMENTOS LTDA:29237659000148}",
+      "fields": [
+        {
+          "name": "time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {}
+        },
+        {
+          "name": "SERVICE_METHOD-54CAAEB758814F53 criarCobrancaPutEmv - FIX PAY ADMINISTRACAO DE PAGAMENTOS LTDA:29237659000148",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "dt.entity.service_method": "SERVICE_METHOD-54CAAEB758814F53",
+            "dt.entity.service_method.name": "criarCobrancaPutEmv - FIX PAY ADMINISTRACAO DE PAGAMENTOS LTDA:29237659000148"
+          },
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1765905300000,
+          1765905600000,
+          1765905900000,
+          1765906200000,
+          1765906500000,
+          1765906800000,
+          1765907100000,
+          1765907400000,
+          1765907700000,
+          1765908000000,
+          1765908300000,
+          1765908600000,
+          1765908900000,
+          1765909200000,
+          1765909500000,
+          1765909800000,
+          1765910100000,
+          1765910400000,
+          1765910700000,
+          1765911000000,
+          1765911300000,
+          1765911600000,
+          1765911900000,
+          1765912200000,
+          1765912500000,
+          1765912800000,
+          1765913100000,
+          1765913400000,
+          1765913700000,
+          1765914000000,
+          1765914300000,
+          1765914600000
+        ],
+        [
+          4,
+          1,
+          21,
+          7,
+          5,
+          11,
+          10,
+          9,
+          10,
+          1,
+          9,
+          3,
+          7,
+          1,
+          14,
+          6,
+          3,
+          6,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    }
+  }
+]

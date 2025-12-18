@@ -107,6 +107,7 @@ type queryModel struct {
 	CustomFrom       string  `json:"customFrom"`
 	CustomTo         string  `json:"customTo"`
 	Resolution       string  `json:"resolution"`
+	LabelChart       string  `json:"labelChart"` // Field from labels to use for chart legend
 	QueryText        string  `json:"queryText"`
 	Constant         float64 `json:"constant"`
 }
@@ -206,18 +207,72 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 			// Log dimensionMap for debugging
 			log.DefaultLogger.Info("Processing data", "metricId", result.MetricId, "dimensionMap", dataSet.DimensionMap, "dimensionCount", len(dataSet.DimensionMap))
 
-			// Create frame name based on metric ID and dimensions
+			// Add value field with labels from dimensionMap
+			// Note: dimensionMap can be nil or empty map, both are handled correctly by NewField
+			labels := dataSet.DimensionMap
+			if labels == nil {
+				labels = make(map[string]string)
+			}
+
+			// Build frame name and field name based on metric ID and dimensions
+			// Use labelChart if specified to create a cleaner name
 			frameName := result.MetricId
-			if len(dataSet.DimensionMap) > 0 {
-				// Build a descriptive name including dimension values
-				dimensionLabels := ""
-				for key, value := range dataSet.DimensionMap {
-					if dimensionLabels != "" {
-						dimensionLabels += ", "
+			fieldName := result.MetricId
+			fieldLabels := labels // Labels to attach to the field (keep all by default)
+
+			if len(labels) > 0 {
+				if qm.LabelChart != "" && qm.LabelChart != "" {
+					// User specified a labelChart field - use only that field for the name
+					if labelValue, exists := labels[qm.LabelChart]; exists {
+						// Use the specified label value for both frame and field names
+						frameName = labelValue
+						fieldName = labelValue
+						// Don't attach labels to the field to avoid duplication in legend
+						fieldLabels = nil
+						log.DefaultLogger.Info("Using labelChart field", "labelChart", qm.LabelChart, "value", labelValue)
+					} else {
+						log.DefaultLogger.Warn("Label field not found in dimensionMap", "labelChart", qm.LabelChart, "availableLabels", labels)
+						// Fallback to default behavior: use all dimension values
+						dimensionValues := ""
+						for _, value := range labels {
+							if dimensionValues != "" {
+								dimensionValues += " "
+							}
+							dimensionValues += value
+						}
+						fieldName = dimensionValues
+
+						// Build frameName with key=value format
+						dimensionLabels := ""
+						for key, value := range labels {
+							if dimensionLabels != "" {
+								dimensionLabels += ", "
+							}
+							dimensionLabels += fmt.Sprintf("%s=%s", key, value)
+						}
+						frameName = fmt.Sprintf("%s{%s}", result.MetricId, dimensionLabels)
 					}
-					dimensionLabels += fmt.Sprintf("%s=%s", key, value)
+				} else {
+					// Default behavior: use all dimension values in field name
+					dimensionValues := ""
+					for _, value := range labels {
+						if dimensionValues != "" {
+							dimensionValues += " "
+						}
+						dimensionValues += value
+					}
+					fieldName = dimensionValues
+
+					// Build frameName with key=value format
+					dimensionLabels := ""
+					for key, value := range labels {
+						if dimensionLabels != "" {
+							dimensionLabels += ", "
+						}
+						dimensionLabels += fmt.Sprintf("%s=%s", key, value)
+					}
+					frameName = fmt.Sprintf("%s{%s}", result.MetricId, dimensionLabels)
 				}
-				frameName = fmt.Sprintf("%s{%s}", result.MetricId, dimensionLabels)
 			}
 
 			// Create data frame with descriptive name
@@ -232,29 +287,8 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 			// Add time field
 			frame.Fields = append(frame.Fields, data.NewField("time", nil, times))
 
-			// Add value field with labels from dimensionMap
-			// Note: dimensionMap can be nil or empty map, both are handled correctly by NewField
-			labels := dataSet.DimensionMap
-			if labels == nil {
-				labels = make(map[string]string)
-			}
-
-			// Build field name from dimension values to avoid "value" prefix in legend
-			fieldName := result.MetricId
-			if len(labels) > 0 {
-				// Use dimension values in field name for better legend display
-				dimensionValues := ""
-				for _, value := range labels {
-					if dimensionValues != "" {
-						dimensionValues += " "
-					}
-					dimensionValues += value
-				}
-				fieldName = dimensionValues
-			}
-
-			log.DefaultLogger.Info("Creating value field with labels", "labels", labels, "fieldName", fieldName)
-			valueField := data.NewField(fieldName, labels, dataSet.Values)
+			log.DefaultLogger.Info("Creating value field", "labels", fieldLabels, "fieldName", fieldName, "frameName", frameName)
+			valueField := data.NewField(fieldName, fieldLabels, dataSet.Values)
 			frame.Fields = append(frame.Fields, valueField)
 
 			// Add metadata for better visualization

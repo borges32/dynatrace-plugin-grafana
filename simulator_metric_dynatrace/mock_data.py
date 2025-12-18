@@ -140,6 +140,38 @@ METRICS = [
             }
         ],
         "entityType": ["MOBILE_APPLICATION"]
+    },
+    {
+        "metricId": "builtin:service.keyRequest.count.total",
+        "displayName": "Key request count",
+        "description": "Total count of key service method requests",
+        "unit": "Count",
+        "aggregationTypes": ["count", "sum"],
+        "transformations": ["filter", "splitBy", "sort", "limit"],
+        "defaultAggregation": {
+            "type": "count"
+        },
+        "dimensionDefinitions": [
+            {
+                "key": "dt.entity.service",
+                "name": "Service",
+                "index": 0,
+                "type": "ENTITY"
+            },
+            {
+                "key": "dt.entity.service_method",
+                "name": "Service Method",
+                "index": 1,
+                "type": "ENTITY"
+            },
+            {
+                "key": "dt.entity.service_method.name",
+                "name": "Service Method Name",
+                "index": 2,
+                "type": "STRING"
+            }
+        ],
+        "entityType": ["SERVICE", "SERVICE_METHOD"]
     }
 ]
 
@@ -181,8 +213,8 @@ def get_mock_data_points(metric_id, from_timestamp, to_timestamp, resolution="1m
             value = random.uniform(20, 90)
         elif "response.time" in metric_id:
             value = random.uniform(100, 5000)
-        elif "request.count" in metric_id:
-            value = random.randint(10, 1000)
+        elif "request.count" in metric_id or "keyRequest.count" in metric_id:
+            value = random.randint(1000, 2800)
         elif "crashCount" in metric_id:
             value = random.randint(0, 50)
         elif "disk" in metric_id:
@@ -194,3 +226,83 @@ def get_mock_data_points(metric_id, from_timestamp, to_timestamp, resolution="1m
         current_ts += interval
     
     return data_points
+
+
+def get_mock_multi_series_data(metric_id, from_timestamp, to_timestamp, resolution="5m"):
+    """
+    Generate mock data for metrics with multiple series (splitBy)
+    Returns data in the format expected by the real Dynatrace API
+    """
+    import random
+    
+    # Parse timestamps
+    if isinstance(from_timestamp, str):
+        from_ts = int(from_timestamp)
+    else:
+        from_ts = from_timestamp
+    
+    if isinstance(to_timestamp, str):
+        to_ts = int(to_timestamp)
+    else:
+        to_ts = to_timestamp
+    
+    # Calculate interval based on resolution
+    interval_map = {
+        "1m": 60000,
+        "5m": 300000,
+        "1h": 3600000,
+        "1d": 86400000
+    }
+    interval = interval_map.get(resolution, 300000)
+    
+    # Generate timestamps
+    timestamps = []
+    current_ts = from_ts
+    while current_ts <= to_ts:
+        timestamps.append(current_ts)
+        current_ts += interval
+    
+    # Define mock service methods based on the real dynatrace.json example
+    if "keyRequest.count" in metric_id or "service" in metric_id:
+        series = [
+            {
+                "dimensions": ["dt.entity.service_method"],
+                "dimensionMap": {
+                    "dt.entity.service_method": "SERVICE_METHOD-7B94CA28812AEDEB",
+                    "dt.entity.service_method.name": "criarCobrancaPut - bki.cielo.com.br"
+                },
+                "timestamps": timestamps.copy(),
+                "values": [random.randint(2000, 2800) for _ in timestamps]
+            },
+            {
+                "dimensions": ["dt.entity.service_method"],
+                "dimensionMap": {
+                    "dt.entity.service_method": "SERVICE_METHOD-586B0DAF0DCA0215",
+                    "dt.entity.service_method.name": "criarCobrancaPutEmv - IFOOD COM AGENCIA DE RESTAURANTES ONLINE S A:14380200000121"
+                },
+                "timestamps": timestamps.copy(),
+                "values": [random.randint(1000, 1400) for _ in timestamps]
+            },
+            {
+                "dimensions": ["dt.entity.service_method"],
+                "dimensionMap": {
+                    "dt.entity.service_method": "SERVICE_METHOD-ABC123DEF456",
+                    "dt.entity.service_method.name": "processPayment - payment.service.com"
+                },
+                "timestamps": timestamps.copy(),
+                "values": [random.randint(500, 1000) for _ in timestamps]
+            }
+        ]
+    else:
+        # Default series for other metric types
+        series = [
+            {
+                "dimensions": [],
+                "dimensionMap": {},
+                "timestamps": timestamps.copy(),
+                "values": [random.uniform(0, 100) for _ in timestamps]
+            }
+        ]
+    
+    return series
+

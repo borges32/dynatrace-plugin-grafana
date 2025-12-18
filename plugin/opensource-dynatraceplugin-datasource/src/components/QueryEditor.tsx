@@ -42,7 +42,12 @@ export function QueryEditor({ query, onChange, onRunQuery }: Props) {
     onRunQuery();
   };
 
-  const { metricSelector, useDashboardTime, customFrom, customTo, resolution } = query;
+  // Label Chart handler
+  const onLabelChartChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onChange({ ...query, labelChart: event.target.value });
+  };
+
+  const { metricSelector, useDashboardTime, customFrom, customTo, resolution, labelChart } = query;
 
   return (
     <div className="gf-form-group">
@@ -87,6 +92,22 @@ export function QueryEditor({ query, onChange, onRunQuery }: Props) {
             value={resolution}
             onChange={onResolutionChange}
             width={20}
+          />
+        </InlineField>
+      </div>
+
+      <div className="gf-form">
+        <InlineField 
+          label="Label Chart" 
+          labelWidth={20}
+          tooltip="Specify which label field to use for chart legend (e.g., dt.entity.service_method.name). Leave empty to use default."
+          grow
+        >
+          <Input
+            onChange={onLabelChartChange}
+            onBlur={onRunQuery}
+            value={labelChart || ''}
+            placeholder="dt.entity.service_method.name"
           />
         </InlineField>
       </div>

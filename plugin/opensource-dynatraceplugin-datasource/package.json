@@ -1,6 +1,6 @@
 {
   "name": "dynatrace-plugin-datasource",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A datasource plugin that enables communication with the dynatrace metrics api",
   "scripts": {
     "build": "npm run build:backend && webpack -c ./.config/webpack/webpack.config.ts --env production",

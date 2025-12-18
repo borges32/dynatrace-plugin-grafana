@@ -10,7 +10,7 @@ from flask_cors import CORS
 from functools import wraps
 import time
 import os
-from mock_data import METRICS, get_mock_data_points
+from mock_data import METRICS, get_mock_data_points, get_mock_multi_series_data
 
 app = Flask(__name__)
 CORS(app)
@@ -156,12 +156,34 @@ def query_metrics():
     
     # Parse metric selector to extract base metric ID
     # Format: metricId:filter(...):splitBy(...):sort(...)
-    base_metric_id = metric_selector.split(':')[0] if metric_selector else ''
+    # Need to handle complex metric IDs like "builtin:service.keyRequest.count.total"
+    base_metric_id = ''
+    if metric_selector:
+        # Split by transformation keywords to get the base metric ID
+        parts = metric_selector.split(':filter(')
+        if len(parts) > 1:
+            base_metric_id = parts[0]
+        else:
+            parts = metric_selector.split(':splitBy(')
+            if len(parts) > 1:
+                base_metric_id = parts[0]
+            else:
+                parts = metric_selector.split(':sort(')
+                if len(parts) > 1:
+                    base_metric_id = parts[0]
+                else:
+                    # No transformations, use the whole selector
+                    base_metric_id = metric_selector
     
     # Extract filter information (simplified parsing)
     has_filter = ':filter(' in metric_selector
     has_split_by = ':splitBy(' in metric_selector
     has_sort = ':sort(' in metric_selector
+    
+    # Debug logging
+    print(f"[DEBUG] Metric selector: {metric_selector}")
+    print(f"[DEBUG] Base metric ID: {base_metric_id}")
+    print(f"[DEBUG] Has splitBy: {has_split_by}")
     
     # Find matching metric
     matching_metric = None
@@ -176,6 +198,8 @@ def query_metrics():
     if not matching_metric:
         matching_metric = METRICS[0] if METRICS else None
     
+    print(f"[DEBUG] Matching metric: {matching_metric['metricId'] if matching_metric else 'None'}")
+    
     if not matching_metric:
         return jsonify({
             "error": {
@@ -184,19 +208,18 @@ def query_metrics():
             }
         }), 404
     
-    # Generate mock data points
-    data_points = get_mock_data_points(
-        matching_metric['metricId'], 
-        int(from_param), 
-        int(to_param), 
-        resolution
-    )
-    
     # Build response - format depends on transformations
     if has_split_by:
-        # When splitBy is used, return data with dimensions
+        # When splitBy is used, return data with dimensions (multiple series)
+        series_data = get_mock_multi_series_data(
+            matching_metric['metricId'], 
+            int(from_param), 
+            int(to_param), 
+            resolution
+        )
+        
         response = {
-            "totalCount": 1,
+            "totalCount": len(series_data),
             "nextPageKey": None,
             "resolution": resolution,
             "result": [
@@ -204,21 +227,19 @@ def query_metrics():
                     "metricId": base_metric_id or matching_metric['metricId'],
                     "dataPointCountRatio": 1.0,
                     "dimensionCountRatio": 1.0,
-                    "data": [
-                        {
-                            "dimensions": ["dt.entity.device_application"],
-                            "dimensionMap": {
-                                "dt.entity.device_application": "MOBILE_APPLICATION-1234567890ABCDEF"
-                            },
-                            "timestamps": [dp[0] for dp in data_points],
-                            "values": [dp[1] for dp in data_points]
-                        }
-                    ]
+                    "data": series_data
                 }
             ]
         }
     else:
-        # Standard response without dimensions
+        # Standard response without dimensions (single series)
+        data_points = get_mock_data_points(
+            matching_metric['metricId'], 
+            int(from_param), 
+            int(to_param), 
+            resolution
+        )
+        
         response = {
             "totalCount": 1,
             "nextPageKey": None,
@@ -334,6 +355,7 @@ def root():
         },
         "examples": {
             "simple_query": "/api/v2/metrics/query?metricSelector=builtin:host.cpu.usage",
+            "service_requests": "/api/v2/metrics/query?metricSelector=builtin:service.keyRequest.count.total:filter(and(or(in(\"dt.entity.service_method\",entitySelector(\"type(service_method)\"))))):splitBy(\"dt.entity.service_method\"):sort(value(auto,descending)):limit(20)&resolution=5m",
             "filtered_query": "/api/v2/metrics/query?metricSelector=builtin:apps.other.crashCount.osAndVersion:filter(and(or(in(\"dt.entity.os\",entitySelector(\"type(os)\")))))&from=1699500000000&to=1699503600000",
             "complex_query": "/api/v2/metrics/query?metricSelector=builtin:apps.other.crashCount.osAndVersion:filter(...):splitBy():sort(value(auto,descending))"
         }
@@ -351,8 +373,13 @@ if __name__ == '__main__':
     print("  GET  /api/v2/metrics/query - Query metrics with filters")
     print("  POST /api/v2/metrics/query - Query metrics (JSON body)")
     print("  GET  /health - Health check")
-    print("\nExample query with filters:")
-    print("  /api/v2/metrics/query?metricSelector=builtin:apps.other.crashCount.osAndVersion:filter(...):splitBy():sort(...)")
+    print("\nExample queries:")
+    print("  1. Simple query:")
+    print("     /api/v2/metrics/query?metricSelector=builtin:host.cpu.usage")
+    print("\n  2. Service requests with splitBy (multiple series):")
+    print("     /api/v2/metrics/query?metricSelector=builtin:service.keyRequest.count.total:splitBy(\"dt.entity.service_method\")&resolution=5m")
+    print("\n  3. Complex query with filters:")
+    print("     /api/v2/metrics/query?metricSelector=builtin:service.keyRequest.count.total:filter(...):splitBy():sort(value(auto,descending)):limit(20)")
     print("=" * 60)
     
     app.run(host='0.0.0.0', port=8080, debug=True)

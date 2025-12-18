@@ -25,6 +25,10 @@ export interface MyQuery extends DataQuery {
   
   // Resolution for data points (e.g., "1m", "5m", "1h")
   resolution?: string;
+  
+  // Label Chart - field from labels to use for chart legend
+  // (e.g., "dt.entity.service_method.name")
+  labelChart?: string;
 }
 
 export const DEFAULT_QUERY: Partial<MyQuery> = {
