@@ -414,6 +414,8 @@ func parseTimestamp(ts string) (int64, error) {
 // The main use case for these health checks is the test button on the
 // datasource configuration page which allows users to verify that
 // a datasource is working as expected.
+// Note: Dynatrace SaaS API v2 does not have a /health endpoint, so we only
+// validate that the required configuration fields are present.
 func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	log.DefaultLogger.Info("CheckHealth called")
 
@@ -432,44 +434,12 @@ func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRe
 		}, nil
 	}
 
-	// Test connection by querying the /health endpoint
-	url := fmt.Sprintf("%s/health", d.apiUrl)
-	reqHttp, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-	if err != nil {
-		return &backend.CheckHealthResult{
-			Status:  backend.HealthStatusError,
-			Message: fmt.Sprintf("Error creating health check request: %v", err),
-		}, nil
-	}
-
-	// Create HTTP client with TLS configuration
-	client, err := d.createHTTPClient()
-	if err != nil {
-		return &backend.CheckHealthResult{
-			Status:  backend.HealthStatusError,
-			Message: fmt.Sprintf("Error creating HTTP client: %v", err),
-		}, nil
-	}
-
-	resp, err := client.Do(reqHttp)
-	if err != nil {
-		return &backend.CheckHealthResult{
-			Status:  backend.HealthStatusError,
-			Message: fmt.Sprintf("Error connecting to Dynatrace API: %v", err),
-		}, nil
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return &backend.CheckHealthResult{
-			Status:  backend.HealthStatusError,
-			Message: fmt.Sprintf("Dynatrace API health check failed (status %d): %s", resp.StatusCode, string(body)),
-		}, nil
-	}
-
+	// Configuration is valid
+	// Note: We cannot test the connection here because Dynatrace SaaS API v2
+	// does not provide a dedicated health endpoint. The actual connection
+	// will be tested when the first query is executed.
 	return &backend.CheckHealthResult{
 		Status:  backend.HealthStatusOk,
-		Message: "Successfully connected to Dynatrace API",
+		Message: "Configuration is valid. Connection will be tested on first query.",
 	}, nil
 }
