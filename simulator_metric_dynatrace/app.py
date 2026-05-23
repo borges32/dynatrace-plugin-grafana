@@ -11,6 +11,8 @@ from functools import wraps
 import time
 import os
 from mock_data import METRICS, get_mock_data_points, get_mock_multi_series_data
+from mock_logs import generate_log_records
+from mock_alerts import generate_problems, filter_problems, is_dql_query
 
 app = Flask(__name__)
 CORS(app)
@@ -335,6 +337,160 @@ def get_metric_data_points(metric_id):
     return jsonify(response), 200
 
 
+def _parse_time_param(value, default_ms):
+    """Parse a Dynatrace time parameter (millis or ISO-8601) into millis."""
+    if value is None or value == '':
+        return default_ms
+    # numeric (millis)
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        pass
+    # ISO-8601
+    try:
+        from datetime import datetime
+        # Accept the trailing Z
+        v = value.replace('Z', '+00:00')
+        return int(datetime.fromisoformat(v).timestamp() * 1000)
+    except Exception:
+        return default_ms
+
+
+@app.route('/api/v2/logs/search', methods=['GET', 'POST'])
+@require_api_token
+def logs_search():
+    """
+    Search log records.
+    Mirrors Dynatrace SaaS endpoint POST/GET /api/v2/logs/search.
+
+    Supported parameters (query string or JSON body):
+    - query:    A simplified DQL-style query. Supports:
+                * free text   -> contains filter against `content`
+                * key=value   -> field equality filter (host.name="x")
+                * status=ERROR
+    - from:     Start timestamp (millis or ISO-8601). Default: now - 2h
+    - to:       End timestamp   (millis or ISO-8601). Default: now
+    - limit:    Max number of records (default 1000, max 10000)
+    - sort:     "asc" or "desc" by timestamp (default "desc")
+    """
+    if request.method == 'POST':
+        data = request.get_json(silent=True) or {}
+        query = data.get('query', '')
+        from_param = data.get('from')
+        to_param = data.get('to')
+        limit = int(data.get('limit', 1000))
+        sort = data.get('sort', 'desc')
+    else:
+        query = request.args.get('query', '')
+        from_param = request.args.get('from')
+        to_param = request.args.get('to')
+        limit = int(request.args.get('limit', 1000))
+        sort = request.args.get('sort', 'desc')
+
+    now_ms = int(time.time() * 1000)
+    to_ms = _parse_time_param(to_param, now_ms)
+    from_ms = _parse_time_param(from_param, now_ms - 2 * 3600 * 1000)
+
+    if from_ms >= to_ms:
+        return jsonify({
+            "error": {"code": 400, "message": "'from' must be earlier than 'to'"}
+        }), 400
+
+    limit = max(1, min(limit, 10000))
+
+    # All filtering (including severity) is handled by the DQL parser inside
+    # `generate_log_records`. Just forward the raw query string.
+    records = generate_log_records(from_ms, to_ms, limit=limit,
+                                   query=query or '')
+
+    # Sort by timestamp
+    records.sort(key=lambda r: r['timestamp'], reverse=(sort != 'asc'))
+
+    response = {
+        "totalCount": len(records),
+        "sliceSize": len(records),
+        "sliceStart": 0,
+        "results": records,
+    }
+    return jsonify(response), 200
+
+
+@app.route('/api/v2/problems', methods=['GET', 'POST'])
+@require_api_token
+def list_problems():
+    """
+    List Dynatrace problems (alerts).
+
+    Mirrors GET /api/v2/problems on Dynatrace SaaS. Supported parameters
+    (query string or JSON body):
+      - problemSelector: Dynatrace mini-DSL — comma-separated clauses such as
+            status("OPEN"),severityLevel("ERROR","AVAILABILITY"),text("foo"),
+            entityTags("env:prod"),managementZones("Production")
+        Also accepts a DQL pipeline (e.g.
+            fetch dt.davis.problems | filter event.status == "OPEN" and severityLevel == "ERROR" | sort startTime desc | limit 50
+        ). DQL is detected automatically when the value starts with "fetch"
+        or contains a pipe.
+      - from / to:   Time window in millis or ISO-8601. Default: last 24h.
+      - pageSize:    Max results (default 50, max 500).
+      - fields:      Field projection (forwarded but ignored by the simulator).
+      - sort:        "startTime"|"endTime"|... + " asc"|" desc". Default: "startTime desc".
+    """
+    if request.method == 'POST':
+        data = request.get_json(silent=True) or {}
+    else:
+        data = {k: v for k, v in request.args.items()}
+
+    selector = data.get('problemSelector', '') or ''
+    from_param = data.get('from')
+    to_param = data.get('to')
+    page_size = int(data.get('pageSize', 50))
+    sort_spec = (data.get('sort') or 'startTime desc').strip().split()
+    sort_field = sort_spec[0] if sort_spec else 'startTime'
+    sort_desc = (len(sort_spec) < 2) or (sort_spec[1].lower() == 'desc')
+
+    now_ms = int(time.time() * 1000)
+    to_ms = _parse_time_param(to_param, now_ms)
+    from_ms = _parse_time_param(from_param, now_ms - 24 * 3600 * 1000)
+    if from_ms >= to_ms:
+        return jsonify({"error": {"code": 400, "message": "'from' must be earlier than 'to'"}}), 400
+
+    page_size = max(1, min(page_size, 500))
+
+    pool = generate_problems(from_ms, to_ms)
+
+    dql_query = selector if is_dql_query(selector) else ''
+    problem_selector = '' if dql_query else selector
+
+    results = filter_problems(
+        pool,
+        problem_selector=problem_selector,
+        dql_query=dql_query,
+        from_ms=from_ms, to_ms=to_ms,
+        sort_field=sort_field, sort_desc=sort_desc,
+        limit=page_size,
+    )
+
+    return jsonify({
+        "totalCount": len(results),
+        "pageSize":   page_size,
+        "nextPageKey": None,
+        "problems":   results,
+    }), 200
+
+
+@app.route('/api/v2/problems/<path:problem_id>', methods=['GET'])
+@require_api_token
+def get_problem(problem_id):
+    """Mirrors GET /api/v2/problems/{problemId}. Returns the full record or 404."""
+    now_ms = int(time.time() * 1000)
+    # Search a wide window so direct lookups by id still resolve.
+    pool = generate_problems(now_ms - 7 * 24 * 3600 * 1000, now_ms)
+    for p in pool:
+        if p["problemId"] == problem_id or p["displayId"] == problem_id:
+            return jsonify(p), 200
+    return jsonify({"error": {"code": 404, "message": f"Problem '{problem_id}' not found"}}), 404
+
+
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -351,6 +507,9 @@ def root():
             "list_metrics": "GET /api/v2/metrics",
             "get_metric_data": "GET /api/v2/metrics/{metricId}",
             "query_metrics": "GET|POST /api/v2/metrics/query",
+            "logs_search": "GET|POST /api/v2/logs/search",
+            "list_problems": "GET|POST /api/v2/problems",
+            "get_problem":   "GET /api/v2/problems/{problemId}",
             "health": "GET /health"
         },
         "examples": {

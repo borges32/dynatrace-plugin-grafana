@@ -6,6 +6,12 @@ import { MyDataSourceOptions, MyQuery } from '../types';
 
 type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
+const QUERY_TYPE_OPTIONS: Array<SelectableValue<string>> = [
+  { label: 'Metrics', value: 'metrics' },
+  { label: 'Logs (Loki format)', value: 'logs' },
+  { label: 'Alerts (Problems)', value: 'alerts' },
+];
+
 const RESOLUTION_OPTIONS: Array<SelectableValue<string>> = [
   { label: '1 minute', value: '1m' },
   { label: '5 minutes', value: '5m' },
@@ -47,15 +53,152 @@ export function QueryEditor({ query, onChange, onRunQuery }: Props) {
     onChange({ ...query, labelChart: event.target.value });
   };
 
-  const { metricSelector, useDashboardTime, customFrom, customTo, resolution, labelChart } = query;
+  // Query Type handler (metrics vs. logs)
+  const onQueryTypeChange = (option: SelectableValue<string>) => {
+    onChange({ ...query, queryType: (option.value as 'metrics' | 'logs') || 'metrics' });
+    onRunQuery();
+  };
+
+  // Log query handlers
+  const onLogQueryChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    onChange({ ...query, logQuery: event.target.value });
+  };
+
+  const onLogLimitChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const n = parseInt(event.target.value, 10);
+    onChange({ ...query, logLimit: isNaN(n) ? undefined : n });
+  };
+
+  // Alert query handlers
+  const onAlertSelectorChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    onChange({ ...query, alertSelector: event.target.value });
+  };
+
+  const onAlertPageSizeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const n = parseInt(event.target.value, 10);
+    onChange({ ...query, alertPageSize: isNaN(n) ? undefined : n });
+  };
+
+  const queryType = query.queryType || 'metrics';
+  const { metricSelector, useDashboardTime, customFrom, customTo, resolution, labelChart, logQuery, logLimit, alertSelector, alertPageSize } = query;
 
   return (
     <div className="gf-form-group">
-      <h6 className="page-heading">Dynatrace Metric Query</h6>
-      
+      <h6 className="page-heading">
+        Dynatrace {queryType === 'logs' ? 'Logs' : queryType === 'alerts' ? 'Alerts' : 'Metric'} Query
+      </h6>
+
       <div className="gf-form">
-        <InlineField 
-          label="Metric Selector" 
+        <InlineField
+          label="Query Type"
+          labelWidth={20}
+          tooltip="Choose Metrics (default) or Logs (Dynatrace /api/v2/logs/search, returned in Loki format)"
+        >
+          <Select
+            options={QUERY_TYPE_OPTIONS}
+            value={queryType}
+            onChange={onQueryTypeChange}
+            width={28}
+          />
+        </InlineField>
+      </div>
+
+      {queryType === 'logs' && (
+        <>
+          <div className="gf-form">
+            <InlineField
+              label="Log Query"
+              labelWidth={20}
+              tooltip='Dynatrace log search query. Supports free text and key=value filters (e.g. host.name="host-prod-01" status=ERROR).'
+              grow
+            >
+              <div style={{ width: '100%' }}>
+                <TextArea
+                  onChange={onLogQueryChange}
+                  onBlur={onRunQuery}
+                  value={logQuery || ''}
+                  placeholder={'ERROR\nor with filters:\nhost.name="host-prod-01" status=ERROR'}
+                  rows={3}
+                  style={{ width: '100%', fontFamily: 'monospace', fontSize: '13px' }}
+                />
+                <div style={{ marginTop: '4px', fontSize: '11px', color: '#888' }}>
+                  Examples:
+                  <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                    <li><code>ERROR</code></li>
+                    <li><code>status=ERROR</code></li>
+                    <li><code>host.name=&quot;host-prod-01&quot; service.name=&quot;api-gateway&quot;</code></li>
+                  </ul>
+                </div>
+              </div>
+            </InlineField>
+          </div>
+
+          <div className="gf-form">
+            <InlineField label="Limit" labelWidth={20} tooltip="Maximum number of log records (default 1000, max 10000)">
+              <Input
+                type="number"
+                onChange={onLogLimitChange}
+                onBlur={onRunQuery}
+                value={logLimit ?? 1000}
+                placeholder="1000"
+                width={20}
+              />
+            </InlineField>
+          </div>
+        </>
+      )}
+
+      {queryType === 'alerts' && (
+        <>
+          <div className="gf-form">
+            <InlineField
+              label="Problem Selector"
+              labelWidth={20}
+              tooltip='Dynatrace problemSelector mini-DSL (status("OPEN"),severityLevel("ERROR"),...) OR a DQL pipeline (fetch dt.davis.problems | filter ... | sort ... | limit N).'
+              grow
+            >
+              <div style={{ width: '100%' }}>
+                <TextArea
+                  onChange={onAlertSelectorChange}
+                  onBlur={onRunQuery}
+                  value={alertSelector || ''}
+                  placeholder={'status("OPEN"),severityLevel("ERROR")\nor DQL:\nfetch dt.davis.problems | filter event.status == "OPEN" | sort startTime desc'}
+                  rows={3}
+                  style={{ width: '100%', fontFamily: 'monospace', fontSize: '13px' }}
+                />
+                <div style={{ marginTop: '4px', fontSize: '11px', color: '#888' }}>
+                  Examples:
+                  <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                    <li><code>status(&quot;OPEN&quot;)</code></li>
+                    <li><code>status(&quot;OPEN&quot;),severityLevel(&quot;ERROR&quot;,&quot;AVAILABILITY&quot;)</code></li>
+                    <li><code>entityTags(&quot;env:prod&quot;),managementZones(&quot;Production&quot;)</code></li>
+                    <li><code>fetch dt.davis.problems | filter event.status == &quot;OPEN&quot; | sort startTime desc | limit 50</code></li>
+                  </ul>
+                </div>
+              </div>
+            </InlineField>
+          </div>
+
+          <div className="gf-form">
+            <InlineField label="Page Size" labelWidth={20} tooltip="Maximum number of problems (default 50, max 500)">
+              <Input
+                type="number"
+                onChange={onAlertPageSizeChange}
+                onBlur={onRunQuery}
+                value={alertPageSize ?? 50}
+                placeholder="50"
+                width={20}
+              />
+            </InlineField>
+          </div>
+        </>
+      )}
+
+      {queryType === 'metrics' && (
+      <>
+      <div className="gf-form">
+        <InlineField
+          label="Metric Selector"
           labelWidth={20}
           tooltip="Dynatrace Metric Selector with filters and transformations"
           grow
@@ -111,10 +254,12 @@ export function QueryEditor({ query, onChange, onRunQuery }: Props) {
           />
         </InlineField>
       </div>
+      </>
+      )}
 
       <div className="gf-form">
-        <InlineField 
-          label="Use Dashboard Time" 
+        <InlineField
+          label="Use Dashboard Time"
           labelWidth={20}
           tooltip="When enabled, uses the time range from the dashboard. When disabled, uses custom time range."
         >

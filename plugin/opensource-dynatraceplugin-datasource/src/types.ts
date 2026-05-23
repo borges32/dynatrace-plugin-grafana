@@ -3,7 +3,29 @@ import { DataQuery, DataSourceJsonData } from '@grafana/data';
 /**
  * Query configuration for Dynatrace metrics
  */
+// Type of query: classic Dynatrace metrics, logs (returned in Loki format) or alerts (problems).
+export type QueryType = 'metrics' | 'logs' | 'alerts';
+
 export interface MyQuery extends DataQuery {
+  // Discriminator between metric and log queries. Defaults to 'metrics' for backward compatibility.
+  queryType?: QueryType;
+
+  // ---- Logs fields (used when queryType === 'logs') ----
+  // Dynatrace logs query string (simplified DQL). Examples:
+  //   "ERROR"
+  //   "host.name=\"host-prod-01\" status=ERROR"
+  logQuery?: string;
+  // Max records to fetch (default 1000)
+  logLimit?: number;
+
+  // ---- Alerts fields (used when queryType === 'alerts') ----
+  // Dynatrace problemSelector (mini-DSL) OR DQL pipeline. Examples:
+  //   status("OPEN"),severityLevel("ERROR")
+  //   fetch dt.davis.problems | filter event.status == "OPEN" | sort startTime desc | limit 50
+  alertSelector?: string;
+  // Max problems to fetch (default 50)
+  alertPageSize?: number;
+
   // Metric selector with transformations (e.g., "builtin:host.cpu.usage:filter(...):splitBy()")
   // This is the primary field for querying metrics with complex filters
   metricSelector?: string;
@@ -32,9 +54,14 @@ export interface MyQuery extends DataQuery {
 }
 
 export const DEFAULT_QUERY: Partial<MyQuery> = {
+  queryType: 'metrics',
   useDashboardTime: true,
   resolution: '5m',
   metricSelector: '',
+  logQuery: '',
+  logLimit: 1000,
+  alertSelector: '',
+  alertPageSize: 50,
 };
 
 /**

@@ -17,6 +17,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application files
 COPY app.py .
 COPY mock_data.py .
+COPY mock_logs.py .
+COPY mock_alerts.py .
+COPY dql.py .
 
 # Expose port
 EXPOSE 8080

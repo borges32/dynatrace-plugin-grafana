@@ -100,6 +100,18 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 
 // queryModel represents the query configuration from frontend
 type queryModel struct {
+	// Discriminator between metric and log queries ("metrics" | "logs").
+	// Empty defaults to "metrics" for backward compatibility.
+	QueryType string `json:"queryType"`
+
+	// ---- Log query fields ----
+	LogQuery string `json:"logQuery"`
+	LogLimit int    `json:"logLimit"`
+
+	// ---- Alert (problems) query fields ----
+	AlertSelector string `json:"alertSelector"`
+	AlertPageSize int    `json:"alertPageSize"`
+
 	MetricSelector   string  `json:"metricSelector"` // Primary field: metric with filters/transformations
 	MetricId         string  `json:"metricId"`       // DEPRECATED: Use MetricSelector instead
 	EntitySelector   string  `json:"entitySelector"` // DEPRECATED: Use filters in MetricSelector
@@ -146,6 +158,15 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 
 	// Log raw query JSON for debugging
 	log.DefaultLogger.Info("Raw query JSON", "json", string(query.JSON))
+
+	// Dispatch on query type: route log queries to the dedicated handler
+	// and return a Loki-compatible frame.
+	if qm.QueryType == "logs" {
+		return d.queryLogs(ctx, qm, query)
+	}
+	if qm.QueryType == "alerts" {
+		return d.queryAlerts(ctx, qm, query)
+	}
 
 	// Determine which field to use (metricSelector takes precedence)
 	metricSelector := qm.MetricSelector
