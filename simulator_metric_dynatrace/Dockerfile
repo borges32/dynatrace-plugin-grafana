@@ -19,6 +19,7 @@ COPY app.py .
 COPY mock_data.py .
 COPY mock_logs.py .
 COPY mock_alerts.py .
+COPY mock_dql_grail.py .
 COPY dql.py .
 
 # Expose port

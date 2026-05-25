@@ -94,7 +94,7 @@ func (d *Datasource) queryDynatraceAlertsAPI(ctx context.Context, selector strin
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
-	req.Header.Set("Authorization", fmt.Sprintf("Api-Token %s", d.apiToken))
+	d.applyAuth(req)
 	req.Header.Set("Content-Type", "application/json")
 
 	client, err := d.createHTTPClient()

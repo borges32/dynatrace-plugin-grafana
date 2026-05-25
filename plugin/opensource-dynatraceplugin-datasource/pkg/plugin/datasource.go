@@ -42,18 +42,26 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		apiUrl = url
 	}
 
+	platformUrl := ""
+	if url, ok := jsonData["platformUrl"].(string); ok {
+		platformUrl = url
+	}
+
 	tlsSkipVerify := false
 	if skip, ok := jsonData["tlsSkipVerify"].(bool); ok {
 		tlsSkipVerify = skip
 	}
 
 	apiToken := settings.DecryptedSecureJSONData["apiToken"]
+	platformToken := settings.DecryptedSecureJSONData["platformToken"]
 	tlsCertificate := settings.DecryptedSecureJSONData["tlsCertificate"]
 
 	return &Datasource{
 		settings:       settings,
 		apiUrl:         apiUrl,
+		platformUrl:    platformUrl,
 		apiToken:       apiToken,
+		platformToken:  platformToken,
 		tlsSkipVerify:  tlsSkipVerify,
 		tlsCertificate: tlsCertificate,
 	}, nil
@@ -63,10 +71,49 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 // its health and has alerting support.
 type Datasource struct {
 	settings       backend.DataSourceInstanceSettings
-	apiUrl         string
-	apiToken       string
+	apiUrl         string // Classic API host: https://<tenant>.live.dynatrace.com
+	platformUrl    string // Platform/Grail host: https://<tenant>.apps.dynatrace.com (optional; falls back to apiUrl)
+	apiToken       string // Classic Api-Token (Authorization: Api-Token ...)
+	platformToken  string // Optional Platform Token for Grail (Authorization: Bearer ...)
 	tlsSkipVerify  bool
 	tlsCertificate string
+}
+
+// grailBaseURL returns the host to use for Grail/Platform endpoints. Prefers
+// platformUrl; falls back to apiUrl so the simulator (single host) and
+// Classic-only tenants keep working without extra config.
+func (d *Datasource) grailBaseURL() string {
+	if d.platformUrl != "" {
+		return d.platformUrl
+	}
+	return d.apiUrl
+}
+
+// userAgent sent on every outbound request. WAFs/corporate proxies frequently
+// reject Go's default ("Go-http-client/1.1") with generic 403 pages.
+const userAgent = "grafana-dynatrace-plugin/2.0 (+https://github.com/dynatrace-plugin-grafana)"
+
+// applyAuth sets the Authorization header on req and also fills common
+// headers (User-Agent, Accept) so requests aren't blocked by corporate
+// proxies or WAFs that inspect outbound traffic.
+//
+// Auth choice:
+//   - Platform Token configured -> Authorization: Bearer <token>
+//     (required by Grail-migrated tenants for /api/v2/logs/search,
+//      /api/v2/problems and /platform/storage/query/v1/...).
+//   - Otherwise -> Authorization: Api-Token <token> (Classic API).
+func (d *Datasource) applyAuth(req *http.Request) {
+	if d.platformToken != "" {
+		req.Header.Set("Authorization", "Bearer "+d.platformToken)
+	} else {
+		req.Header.Set("Authorization", "Api-Token "+d.apiToken)
+	}
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/json")
+	}
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", userAgent)
+	}
 }
 
 // Dispose here tells plugin SDK that plugin wants to clean up resources when a new instance
@@ -107,6 +154,10 @@ type queryModel struct {
 	// ---- Log query fields ----
 	LogQuery string `json:"logQuery"`
 	LogLimit int    `json:"logLimit"`
+
+	// ---- Grail DQL fields ----
+	DqlQuery string `json:"dqlQuery"`
+	DqlLimit int    `json:"dqlLimit"`
 
 	// ---- Alert (problems) query fields ----
 	AlertSelector string `json:"alertSelector"`
@@ -163,6 +214,9 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 	// and return a Loki-compatible frame.
 	if qm.QueryType == "logs" {
 		return d.queryLogs(ctx, qm, query)
+	}
+	if qm.QueryType == "dqlGrail" {
+		return d.queryDqlGrail(ctx, qm, query)
 	}
 	if qm.QueryType == "alerts" {
 		return d.queryAlerts(ctx, qm, query)
@@ -347,9 +401,14 @@ func (d *Datasource) queryDynatraceAPI(ctx context.Context, metricSelector strin
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
-	// Add authentication header
+	// Metrics keep the Classic Api-Token even when a Platform Token is also
+	// configured: the metrics endpoint accepts it on every tenant flavor and
+	// the user confirmed it works in production. Other endpoints (logs,
+	// alerts, DQL) go through applyAuth() and may pick Bearer instead.
 	req.Header.Set("Authorization", fmt.Sprintf("Api-Token %s", d.apiToken))
+	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", userAgent)
 
 	// Create HTTP client with TLS configuration
 	client, err := d.createHTTPClient()
@@ -400,9 +459,13 @@ func (d *Datasource) createHTTPClient() (*http.Client, error) {
 		log.DefaultLogger.Info("Using custom TLS certificate")
 	}
 
-	// Create transport with TLS config
+	// Create transport with TLS config. Honor HTTP_PROXY/HTTPS_PROXY/NO_PROXY
+	// environment variables so corporate proxies pick up the connection
+	// transparently (without this, Grafana behind a forward proxy can never
+	// reach a SaaS tenant).
 	transport := &http.Transport{
 		TLSClientConfig: tlsConfig,
+		Proxy:           http.ProxyFromEnvironment,
 	}
 
 	// Create HTTP client
@@ -448,11 +511,16 @@ func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRe
 		}, nil
 	}
 
-	if d.apiToken == "" {
+	if d.apiToken == "" && d.platformToken == "" {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
-			Message: "API Token is not configured",
+			Message: "At least one of API Token or Platform Token must be configured",
 		}, nil
+	}
+
+	msg := "Configuration is valid. Connection will be tested on first query."
+	if d.platformToken != "" {
+		msg = "Platform Token configured (used for Grail endpoints: logs/DQL/problems). " + msg
 	}
 
 	// Configuration is valid
@@ -461,6 +529,6 @@ func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRe
 	// will be tested when the first query is executed.
 	return &backend.CheckHealthResult{
 		Status:  backend.HealthStatusOk,
-		Message: "Configuration is valid. Connection will be tested on first query.",
+		Message: msg,
 	}, nil
 }

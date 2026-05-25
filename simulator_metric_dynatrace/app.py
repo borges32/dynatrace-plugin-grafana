@@ -13,12 +13,18 @@ import os
 from mock_data import METRICS, get_mock_data_points, get_mock_multi_series_data
 from mock_logs import generate_log_records
 from mock_alerts import generate_problems, filter_problems, is_dql_query
+from mock_dql_grail import start_query as grail_start_query, poll_query as grail_poll_query
 
 app = Flask(__name__)
 CORS(app)
 
 # Valid API tokens for the simulator (can be configured via environment variable)
 VALID_API_TOKENS = os.getenv('DT_API_TOKENS', 'dt0c01.sample.token1,dt0c01.sample.token2,test-token').split(',')
+
+# Pre-issued Platform Tokens accepted as `Authorization: Bearer <token>`.
+# Mirrors Dynatrace Platform Tokens (https://docs.dynatrace.com/docs/manage/identity-access-management/access-tokens-and-oauth-clients/platform-tokens).
+# Override with env: DT_PLATFORM_TOKENS="dt0s16.x.y,dt0s16.a.b"
+VALID_PLATFORM_TOKENS = os.getenv('DT_PLATFORM_TOKENS', 'dt0s16.test-platform-token').split(',')
 
 
 def require_api_token(f):
@@ -39,27 +45,24 @@ def require_api_token(f):
                 }
             }), 401
         
-        # Check format: "Api-Token {token}"
+        # Accept either "Api-Token <t>" (legacy) or "Bearer <t>" (OAuth).
         parts = auth_header.split(' ', 1)
-        if len(parts) != 2 or parts[0] != 'Api-Token':
+        if len(parts) != 2 or parts[0] not in ('Api-Token', 'Bearer'):
             return jsonify({
                 "error": {
                     "code": 401,
-                    "message": "Invalid Authorization header format. Expected format: 'Api-Token {token}'"
+                    "message": "Invalid Authorization header. Expected 'Api-Token <token>' or 'Bearer <token>'"
                 }
             }), 401
-        
-        token = parts[1]
-        
-        # Validate token
-        if token not in VALID_API_TOKENS:
-            return jsonify({
-                "error": {
-                    "code": 401,
-                    "message": "Invalid API token"
-                }
-            }), 401
-        
+
+        scheme, token = parts[0], parts[1]
+        if scheme == 'Api-Token':
+            if token not in VALID_API_TOKENS:
+                return jsonify({"error": {"code": 401, "message": "Invalid API token"}}), 401
+        else:  # Bearer (Platform Token)
+            if token not in VALID_PLATFORM_TOKENS:
+                return jsonify({"error": {"code": 401, "message": "Invalid Platform Token"}}), 401
+
         return f(*args, **kwargs)
     
     return decorated_function
@@ -403,8 +406,16 @@ def logs_search():
     records = generate_log_records(from_ms, to_ms, limit=limit,
                                    query=query or '')
 
-    # Sort by timestamp
-    records.sort(key=lambda r: r['timestamp'], reverse=(sort != 'asc'))
+    # Sort by timestamp. Accept Dynatrace SaaS syntax ("-timestamp" = desc,
+    # "timestamp" = asc) as well as the legacy "asc"/"desc" shortcuts.
+    sort_str = (sort or '').strip()
+    if sort_str.startswith('-'):
+        descending = True
+    elif sort_str.lower() in ('asc', '+timestamp', 'timestamp'):
+        descending = False
+    else:
+        descending = True
+    records.sort(key=lambda r: r['timestamp'], reverse=descending)
 
     response = {
         "totalCount": len(records),
@@ -491,6 +502,57 @@ def get_problem(problem_id):
     return jsonify({"error": {"code": 404, "message": f"Problem '{problem_id}' not found"}}), 404
 
 
+@app.route('/platform/storage/query/v1/query:execute', methods=['POST'])
+@require_api_token
+def grail_execute():
+    """
+    Execute a DQL query on Grail.
+
+    Mirrors the real Dynatrace platform endpoint. Body parameters:
+      - query: DQL pipeline (required).
+                  Examples:
+                    fetch logs | filter k8s.namespace.name == "production"
+                    fetch dt.davis.problems | filter event.status == "OPEN"
+      - defaultTimeframeStart / defaultTimeframeEnd: ISO-8601 strings (optional).
+      - maxResultRecords: max records (default 1000, max 10000).
+
+    Returns 202 with `{state: "RUNNING", requestToken: "..."}` to mimic the
+    asynchronous flow. Results are then retrieved via `query:poll`.
+    """
+    data = request.get_json(silent=True) or {}
+    query = data.get('query', '').strip()
+    if not query:
+        return jsonify({"error": {"code": 400, "message": "Missing 'query'"}}), 400
+
+    limit = int(data.get('maxResultRecords') or data.get('limit') or 1000)
+    limit = max(1, min(limit, 10000))
+
+    now_ms = int(time.time() * 1000)
+    to_ms = _parse_time_param(data.get('defaultTimeframeEnd'), now_ms)
+    from_ms = _parse_time_param(data.get('defaultTimeframeStart'), now_ms - 2 * 3600 * 1000)
+    if from_ms >= to_ms:
+        return jsonify({"error": {"code": 400, "message": "'defaultTimeframeStart' must be earlier than 'defaultTimeframeEnd'"}}), 400
+
+    token = grail_start_query(query, from_ms, to_ms, limit=limit)
+    return jsonify({"state": "RUNNING", "requestToken": token}), 202
+
+
+@app.route('/platform/storage/query/v1/query:poll', methods=['GET'])
+@require_api_token
+def grail_poll():
+    """
+    Poll a previously executed Grail DQL query.
+
+    Required query parameter: `request-token` (matches Dynatrace SaaS).
+    Also accepts the camelCase `requestToken` for convenience.
+    """
+    token = request.args.get('request-token') or request.args.get('requestToken')
+    if not token:
+        return jsonify({"error": {"code": 400, "message": "Missing 'request-token'"}}), 400
+    envelope = grail_poll_query(token)
+    return jsonify(envelope), 200
+
+
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -510,6 +572,8 @@ def root():
             "logs_search": "GET|POST /api/v2/logs/search",
             "list_problems": "GET|POST /api/v2/problems",
             "get_problem":   "GET /api/v2/problems/{problemId}",
+            "grail_execute": "POST /platform/storage/query/v1/query:execute",
+            "grail_poll":    "GET /platform/storage/query/v1/query:poll?request-token=...",
             "health": "GET /health"
         },
         "examples": {

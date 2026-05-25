@@ -6,10 +6,16 @@ import { MyDataSourceOptions, MyQuery } from '../types';
 
 type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
+// Order matters: the most common Grail-tenant options come first, the
+// Classic-only fallbacks come last so users don't pick them by mistake.
 const QUERY_TYPE_OPTIONS: Array<SelectableValue<string>> = [
-  { label: 'Metrics', value: 'metrics' },
-  { label: 'Logs (Loki format)', value: 'logs' },
-  { label: 'Alerts (Problems)', value: 'alerts' },
+  { label: 'Metrics', value: 'metrics', description: 'Classic /api/v2/metrics/query — works on every tenant.' },
+  { label: 'Logs / DQL (Grail)', value: 'dqlGrail',
+    description: 'Grail Query API (/platform/storage/query/v1/query:execute). Use this for logs on Grail-migrated tenants.' },
+  { label: 'Alerts (Problems)', value: 'alerts',
+    description: 'Classic /api/v2/problems — accepts Api-Token or Platform Token.' },
+  { label: 'Logs Classic API (pre-Grail only)', value: 'logs',
+    description: 'Legacy /api/v2/logs/search. Removed on Grail tenants — use “Logs / DQL (Grail)” there.' },
 ];
 
 const RESOLUTION_OPTIONS: Array<SelectableValue<string>> = [
@@ -69,6 +75,16 @@ export function QueryEditor({ query, onChange, onRunQuery }: Props) {
     onChange({ ...query, logLimit: isNaN(n) ? undefined : n });
   };
 
+  // DQL (Grail) handlers
+  const onDqlQueryChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    onChange({ ...query, dqlQuery: event.target.value });
+  };
+
+  const onDqlLimitChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const n = parseInt(event.target.value, 10);
+    onChange({ ...query, dqlLimit: isNaN(n) ? undefined : n });
+  };
+
   // Alert query handlers
   const onAlertSelectorChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     onChange({ ...query, alertSelector: event.target.value });
@@ -80,13 +96,25 @@ export function QueryEditor({ query, onChange, onRunQuery }: Props) {
   };
 
   const queryType = query.queryType || 'metrics';
-  const { metricSelector, useDashboardTime, customFrom, customTo, resolution, labelChart, logQuery, logLimit, alertSelector, alertPageSize } = query;
+  const { metricSelector, useDashboardTime, customFrom, customTo, resolution, labelChart, logQuery, logLimit, dqlQuery, dqlLimit, alertSelector, alertPageSize } = query;
 
   return (
     <div className="gf-form-group">
       <h6 className="page-heading">
-        Dynatrace {queryType === 'logs' ? 'Logs' : queryType === 'alerts' ? 'Alerts' : 'Metric'} Query
+        Dynatrace {queryType === 'logs' ? 'Logs (Classic API)' :
+                   queryType === 'dqlGrail' ? 'Logs / DQL (Grail)' :
+                   queryType === 'alerts' ? 'Alerts' : 'Metric'} Query
       </h6>
+
+      {queryType === 'logs' && (
+        <div style={{ background: '#3a2a00', border: '1px solid #c08000',
+                      color: '#ffd680', padding: '6px 10px', borderRadius: '3px',
+                      marginBottom: '8px', fontSize: '12px' }}>
+          ⚠️ <strong>Classic API only.</strong> The endpoint <code>/api/v2/logs/search</code> does
+          not exist on Grail-migrated tenants and will respond with 403/404. For Grail tenants
+          switch the Query Type to <strong>“Logs / DQL (Grail)”</strong>.
+        </div>
+      )}
 
       <div className="gf-form">
         <InlineField
@@ -140,6 +168,51 @@ export function QueryEditor({ query, onChange, onRunQuery }: Props) {
                 onChange={onLogLimitChange}
                 onBlur={onRunQuery}
                 value={logLimit ?? 1000}
+                placeholder="1000"
+                width={20}
+              />
+            </InlineField>
+          </div>
+        </>
+      )}
+
+      {queryType === 'dqlGrail' && (
+        <>
+          <div className="gf-form">
+            <InlineField
+              label="DQL Query"
+              labelWidth={20}
+              tooltip="Full DQL pipeline executed via Grail (POST query:execute, then poll). Returned as Loki logs frame."
+              grow
+            >
+              <div style={{ width: '100%' }}>
+                <TextArea
+                  onChange={onDqlQueryChange}
+                  onBlur={onRunQuery}
+                  value={dqlQuery || ''}
+                  placeholder={'fetch logs | filter k8s.container.name == "x" | sort timestamp desc | limit 100'}
+                  rows={4}
+                  style={{ width: '100%', fontFamily: 'monospace', fontSize: '13px' }}
+                />
+                <div style={{ marginTop: '4px', fontSize: '11px', color: '#888' }}>
+                  Examples:
+                  <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                    <li><code>fetch logs | filter status == &quot;ERROR&quot; | sort timestamp desc | limit 100</code></li>
+                    <li><code>fetch logs | filter contains(content, &quot;timeout&quot;) and k8s.namespace.name == &quot;production&quot;</code></li>
+                    <li><code>fetch dt.davis.problems | filter event.status == &quot;OPEN&quot; | sort startTime desc | limit 50</code></li>
+                  </ul>
+                </div>
+              </div>
+            </InlineField>
+          </div>
+
+          <div className="gf-form">
+            <InlineField label="Max Records" labelWidth={20} tooltip="Maximum records returned by Grail (default 1000, max 10000)">
+              <Input
+                type="number"
+                onChange={onDqlLimitChange}
+                onBlur={onRunQuery}
+                value={dqlLimit ?? 1000}
                 placeholder="1000"
                 width={20}
               />

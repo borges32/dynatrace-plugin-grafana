@@ -78,7 +78,8 @@ func (d *Datasource) queryDynatraceLogsAPI(ctx context.Context, logQuery string,
 	params.Add("from", strconv.FormatInt(fromMs, 10))
 	params.Add("to", strconv.FormatInt(toMs, 10))
 	params.Add("limit", strconv.Itoa(limit))
-	params.Add("sort", "desc")
+	// Dynatrace SaaS expects a field name; "-timestamp" = descending by time.
+	params.Add("sort", "-timestamp")
 
 	fullUrl := fmt.Sprintf("%s?%s", baseUrl, params.Encode())
 	log.DefaultLogger.Info("Querying Dynatrace logs API", "url", fullUrl)
@@ -87,7 +88,7 @@ func (d *Datasource) queryDynatraceLogsAPI(ctx context.Context, logQuery string,
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
-	req.Header.Set("Authorization", fmt.Sprintf("Api-Token %s", d.apiToken))
+	d.applyAuth(req)
 	req.Header.Set("Content-Type", "application/json")
 
 	client, err := d.createHTTPClient()

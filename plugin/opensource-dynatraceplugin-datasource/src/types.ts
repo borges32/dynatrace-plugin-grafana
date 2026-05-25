@@ -3,8 +3,13 @@ import { DataQuery, DataSourceJsonData } from '@grafana/data';
 /**
  * Query configuration for Dynatrace metrics
  */
-// Type of query: classic Dynatrace metrics, logs (returned in Loki format) or alerts (problems).
-export type QueryType = 'metrics' | 'logs' | 'alerts';
+// Type of query.
+//   - 'metrics'  : classic /api/v2/metrics/query
+//   - 'logs'     : legacy /api/v2/logs/search (Log Search Query syntax)
+//   - 'alerts'   : /api/v2/problems
+//   - 'dqlGrail' : new Grail /platform/storage/query/v1/query:execute (full DQL)
+//                  Returned in the same Loki frame format as 'logs'.
+export type QueryType = 'metrics' | 'logs' | 'alerts' | 'dqlGrail';
 
 export interface MyQuery extends DataQuery {
   // Discriminator between metric and log queries. Defaults to 'metrics' for backward compatibility.
@@ -17,6 +22,13 @@ export interface MyQuery extends DataQuery {
   logQuery?: string;
   // Max records to fetch (default 1000)
   logLimit?: number;
+
+  // ---- Grail DQL fields (used when queryType === 'dqlGrail') ----
+  // Full DQL pipeline executed on Grail. Example:
+  //   fetch logs | filter k8s.container.name == "x" | summarize count() by content
+  dqlQuery?: string;
+  // Max records the Grail engine should return (default 1000).
+  dqlLimit?: number;
 
   // ---- Alerts fields (used when queryType === 'alerts') ----
   // Dynatrace problemSelector (mini-DSL) OR DQL pipeline. Examples:
@@ -60,6 +72,8 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
   metricSelector: '',
   logQuery: '',
   logLimit: 1000,
+  dqlQuery: '',
+  dqlLimit: 1000,
   alertSelector: '',
   alertPageSize: 50,
 };
@@ -68,9 +82,16 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
  * These are options configured for each DataSource instance
  */
 export interface MyDataSourceOptions extends DataSourceJsonData {
-  // Base URL for Dynatrace API (e.g., "http://localhost:8080")
+  // Classic API URL (e.g. https://<tenant>.live.dynatrace.com). Used for
+  // /api/v2/metrics, /api/v2/problems and the legacy /api/v2/logs/search.
   apiUrl?: string;
-  
+
+  // Platform API URL (e.g. https://<tenant>.apps.dynatrace.com). Used for
+  // Grail endpoints — currently DQL (/platform/storage/query/v1/...).
+  // Optional: when blank, the plugin falls back to apiUrl (matches the
+  // single-host simulator and Classic-only tenants).
+  platformUrl?: string;
+
   // Skip TLS certificate verification (insecure)
   tlsSkipVerify?: boolean;
 }
@@ -79,9 +100,16 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
  * Value that is used in the backend, but never sent over HTTP to the frontend
  */
 export interface MySecureJsonData {
-  // Dynatrace API Token (Api-Token format)
+  // Classic Dynatrace API Token (used for /api/v2/metrics/query and other
+  // Classic endpoints). Sent as `Authorization: Api-Token <value>`.
   apiToken?: string;
-  
+
+  // Dynatrace Platform Token (used by Grail endpoints — Logs Search, DQL,
+  // Problems on Grail-migrated tenants). Sent as `Authorization: Bearer <value>`.
+  // Optional: when not set the plugin falls back to the API Token above.
+  // See: https://docs.dynatrace.com/docs/manage/identity-access-management/access-tokens-and-oauth-clients/platform-tokens
+  platformToken?: string;
+
   // TLS client certificate (PEM format)
   tlsCertificate?: string;
 }

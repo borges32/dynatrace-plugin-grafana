@@ -8,7 +8,7 @@
   "backend": true,
   "executable": "gpx_dynatrace_plugin_datasource",
   "info": {
-    "description": "A datasource plugin that enables communication with the Dynatrace Metrics V2 API. Supports querying metrics, custom time ranges, and alerting.",
+    "description": "A datasource plugin that enables communication with the Dynatrace Metrics V2 API. Supports querying metrics, logs, problems, custom time ranges, and alerting.",
     "author": {
       "name": "Open source"
     },

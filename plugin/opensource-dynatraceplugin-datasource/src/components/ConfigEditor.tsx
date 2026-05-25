@@ -8,11 +8,20 @@ interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions> 
 export function ConfigEditor(props: Props) {
   const { onOptionsChange, options } = props;
   
-  // API URL handler
+  // Classic API URL handler
   const onApiUrlChange = (event: ChangeEvent<HTMLInputElement>) => {
     const jsonData = {
       ...options.jsonData,
       apiUrl: event.target.value,
+    };
+    onOptionsChange({ ...options, jsonData });
+  };
+
+  // Platform API URL handler (Grail)
+  const onPlatformUrlChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const jsonData = {
+      ...options.jsonData,
+      platformUrl: event.target.value,
     };
     onOptionsChange({ ...options, jsonData });
   };
@@ -75,6 +84,25 @@ export function ConfigEditor(props: Props) {
     });
   };
 
+  // ---- Platform Token handlers ----
+  const onPlatformTokenChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onOptionsChange({
+      ...options,
+      secureJsonData: {
+        ...options.secureJsonData,
+        platformToken: event.target.value,
+      },
+    });
+  };
+
+  const onResetPlatformToken = () => {
+    onOptionsChange({
+      ...options,
+      secureJsonFields: { ...options.secureJsonFields, platformToken: false },
+      secureJsonData: { ...options.secureJsonData, platformToken: '' },
+    });
+  };
+
   const { jsonData, secureJsonFields } = options;
   const secureJsonData = (options.secureJsonData || {}) as MySecureJsonData;
 
@@ -82,17 +110,30 @@ export function ConfigEditor(props: Props) {
     <div className="gf-form-group">
       <h3 className="page-heading">Dynatrace API Configuration</h3>
       
-      <InlineField 
-        label="API URL" 
+      <InlineField
+        label="Classic API URL"
         labelWidth={20}
-        tooltip="Base URL for Dynatrace Metrics V2 API (e.g., http://localhost:8080 or https://your-dynatrace-instance.com)"
+        tooltip="Base URL for Classic Dynatrace endpoints (metrics, problems, legacy logs). Example: https://<tenant>.live.dynatrace.com"
       >
         <Input
           onChange={onApiUrlChange}
           value={jsonData.apiUrl || ''}
-          placeholder="http://localhost:8080"
+          placeholder="https://<tenant>.live.dynatrace.com"
           width={60}
           required
+        />
+      </InlineField>
+
+      <InlineField
+        label="Platform API URL"
+        labelWidth={20}
+        tooltip="Base URL for Grail/Platform endpoints (DQL). Example: https://<tenant>.apps.dynatrace.com. Leave blank for Classic-only tenants or the simulator — Classic URL is reused in that case."
+      >
+        <Input
+          onChange={onPlatformUrlChange}
+          value={jsonData.platformUrl || ''}
+          placeholder="https://<tenant>.apps.dynatrace.com (Grail)"
+          width={60}
         />
       </InlineField>
 
@@ -109,6 +150,33 @@ export function ConfigEditor(props: Props) {
           onReset={onResetApiToken}
           onChange={onApiTokenChange}
           required
+        />
+      </InlineField>
+
+      <h3 className="page-heading">Platform Token (Grail)</h3>
+      <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>
+        Required by Grail-migrated tenants for Logs (Search Query), DQL (Grail)
+        and Problems. The Platform Token is created in Dynatrace under{' '}
+        <em>Account Management → Access tokens → Platform tokens</em> with the
+        needed Grail permissions (e.g. <code>storage:logs:read</code>,{' '}
+        <code>storage:events:read</code>, <code>storage:bizevents:read</code>).
+        Sent as <code>Authorization: Bearer &lt;token&gt;</code>. Leave empty if
+        your tenant is Classic — the API Token above is then used for every
+        endpoint.
+      </div>
+
+      <InlineField
+        label="Platform Token"
+        labelWidth={20}
+        tooltip="Dynatrace Platform Token (dt0s16.*). Used as Bearer for Grail endpoints (logs/DQL/problems)."
+      >
+        <SecretInput
+          isConfigured={(secureJsonFields && secureJsonFields.platformToken) as boolean}
+          value={secureJsonData.platformToken || ''}
+          placeholder="dt0s16.XXXXXXXXXXXXX.YYYYY..."
+          width={60}
+          onReset={onResetPlatformToken}
+          onChange={onPlatformTokenChange}
         />
       </InlineField>
 
